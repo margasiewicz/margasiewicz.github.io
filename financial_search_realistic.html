@@ -1,0 +1,1915 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Financial Data Search Interface</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f8f9fa;
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        .tabs-container {
+            background: white;
+            border-bottom: 1px solid #e9ecef;
+            padding: 0 20px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 0;
+        }
+
+        .tab {
+            padding: 12px 24px;
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-bottom: none;
+            cursor: pointer;
+            font-weight: 500;
+            color: #666;
+            border-radius: 6px 6px 0 0;
+            margin-right: 2px;
+            transition: all 0.2s ease;
+        }
+
+        .tab.active {
+            background: white;
+            color: #4a90e2;
+            border-color: #e9ecef;
+            position: relative;
+            z-index: 1;
+        }
+
+        .tab:hover:not(.active) {
+            background: #e9ecef;
+            color: #333;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: flex;
+            flex: 1;
+        }
+
+        .worksheet-tabs {
+            display: flex;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e9ecef;
+            padding: 0 20px;
+            gap: 0;
+        }
+
+        .worksheet-tab {
+            padding: 8px 16px;
+            background: #e9ecef;
+            border: 1px solid #dee2e6;
+            border-bottom: none;
+            cursor: pointer;
+            font-size: 13px;
+            color: #666;
+            border-radius: 4px 4px 0 0;
+            margin-right: 1px;
+        }
+
+        .worksheet-tab.active {
+            background: white;
+            color: #4a90e2;
+            border-color: #e9ecef;
+        }
+
+        .search-header {
+            padding: 15px 20px;
+            background: white;
+            border-bottom: 1px solid #e9ecef;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .search-box {
+            width: 100%;
+            max-width: 400px;
+            padding: 12px 16px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 16px;
+            outline: none;
+            transition: all 0.2s ease;
+            background: white;
+        }
+
+        .search-box:focus {
+            border-color: #4a90e2;
+            box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+        }
+
+        .content-wrapper {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .error-summary-content {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+        }
+
+        .sidebar {
+            width: 350px;
+            background: white;
+            border-right: 1px solid #e9ecef;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .file-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px;
+        }
+
+        .file-item {
+            padding: 15px;
+            margin: 5px 10px;
+            background: #f8f9fa;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 1px solid #e9ecef;
+        }
+
+        .file-item:hover {
+            background: #e3f2fd;
+            border-color: #4a90e2;
+        }
+
+        .file-item.active {
+            background: #4a90e2;
+            color: white;
+            border-color: #4a90e2;
+        }
+
+        .file-item.hidden {
+            display: none;
+        }
+
+        .file-name {
+            font-weight: 600;
+            font-size: 16px;
+            margin-bottom: 5px;
+        }
+
+        .file-info {
+            font-size: 12px;
+            opacity: 0.7;
+        }
+
+        .match-count {
+            background: rgba(74, 144, 226, 0.1);
+            color: #4a90e2;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-left: 8px;
+        }
+
+        .main-content {
+            flex: 1;
+            background: white;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .content-header {
+            padding: 20px;
+            border-bottom: 1px solid #e9ecef;
+            background: #f8f9fa;
+        }
+
+        .content-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .content-subtitle {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .data-table-container {
+            flex: 1;
+            overflow: auto;
+            padding: 20px;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 6px;
+            overflow: hidden;
+            border: 1px solid #e9ecef;
+            min-width: max-content;
+        }
+
+        .data-table th {
+            background: #4a90e2;
+            color: white;
+            padding: 12px 10px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 13px;
+            white-space: nowrap;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            min-width: 100px;
+        }
+
+        .data-table td {
+            padding: 10px;
+            border-bottom: 1px solid #f0f0f0;
+            transition: background-color 0.2s ease;
+            white-space: nowrap;
+            font-size: 13px;
+            min-width: 100px;
+            max-width: 150px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .data-table td:hover {
+            white-space: normal;
+            word-wrap: break-word;
+            max-width: none;
+        }
+
+        .data-table tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        .data-table tr.highlight {
+            background-color: rgba(74, 144, 226, 0.1);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+        }
+
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 20px;
+            opacity: 0.3;
+        }
+
+        .upload-section {
+            padding: 15px;
+            border-top: 1px solid #e9ecef;
+            background: #f8f9fa;
+        }
+
+        .upload-btn {
+            width: 100%;
+            padding: 10px;
+            background: #4a90e2;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: background-color 0.2s ease;
+        }
+
+        .upload-btn:hover {
+            background: #357abd;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 40px 20px;
+            color: #666;
+            font-style: italic;
+        }
+
+        /* Comparator Tool Styles */
+        .file-select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #e9ecef;
+            border-radius: 6px;
+            font-size: 14px;
+            background: white;
+            outline: none;
+        }
+
+        .file-select:focus {
+            border-color: #4a90e2;
+            box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.1);
+        }
+
+        .compare-btn {
+            width: 100%;
+            padding: 12px;
+            background: #28a745;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: background-color 0.2s ease;
+        }
+
+        .compare-btn:hover {
+            background: #218838;
+        }
+
+        .compare-btn:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+        }
+
+        .comparison-stats {
+            background: white;
+            border-radius: 6px;
+            padding: 15px;
+            border: 1px solid #e9ecef;
+        }
+
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 13px;
+        }
+
+        .stat-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .stat-label {
+            color: #666;
+        }
+
+        .stat-value {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .stat-value.modified {
+            color: #fd7e14;
+        }
+
+        .stat-value.added {
+            color: #28a745;
+        }
+
+        .stat-value.removed {
+            color: #dc3545;
+        }
+
+        .comparison-tabs {
+            display: flex;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e9ecef;
+            padding: 0 20px;
+            gap: 0;
+        }
+
+        .comparison-tab {
+            padding: 10px 20px;
+            background: #e9ecef;
+            border: 1px solid #dee2e6;
+            border-bottom: none;
+            cursor: pointer;
+            font-size: 14px;
+            color: #666;
+            border-radius: 4px 4px 0 0;
+            margin-right: 1px;
+            transition: all 0.2s ease;
+        }
+
+        .comparison-tab.active {
+            background: white;
+            color: #4a90e2;
+            border-color: #e9ecef;
+        }
+
+        .comparison-tab:hover:not(.active) {
+            background: #dee2e6;
+        }
+
+        .comparison-view {
+            display: none;
+            padding: 20px;
+        }
+
+        .comparison-view.active {
+            display: block;
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 6px;
+            overflow: hidden;
+            border: 1px solid #e9ecef;
+        }
+
+        .comparison-table th {
+            background: #4a90e2;
+            color: white;
+            padding: 12px 10px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 13px;
+            border: 1px solid #357abd;
+        }
+
+        .comparison-table td {
+            padding: 10px;
+            border: 1px solid #e9ecef;
+            font-size: 13px;
+            vertical-align: top;
+        }
+
+        .status-badge {
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-badge.modified {
+            background: rgba(253, 126, 20, 0.1);
+            color: #fd7e14;
+        }
+
+        .status-badge.added {
+            background: rgba(40, 167, 69, 0.1);
+            color: #28a745;
+        }
+
+        .status-badge.removed {
+            background: rgba(220, 53, 69, 0.1);
+            color: #dc3545;
+        }
+
+        .status-badge.unchanged {
+            background: rgba(108, 117, 125, 0.1);
+            color: #6c757d;
+        }
+
+        .unified-comparison {
+            max-height: 600px;
+            overflow-y: auto;
+        }
+
+        .diff-section {
+            margin-bottom: 30px;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #e9ecef;
+        }
+
+        .diff-section h4 {
+            background: #f8f9fa;
+            margin: 0;
+            padding: 15px 20px;
+            border-bottom: 1px solid #e9ecef;
+            font-size: 16px;
+            color: #333;
+        }
+
+        .diff-item {
+            padding: 15px 20px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .diff-item:last-child {
+            border-bottom: none;
+        }
+
+        .diff-item.added {
+            background: rgba(40, 167, 69, 0.05);
+            border-left: 4px solid #28a745;
+        }
+
+        .diff-item.removed {
+            background: rgba(220, 53, 69, 0.05);
+            border-left: 4px solid #dc3545;
+        }
+
+        .diff-header {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .diff-changes {
+            margin-left: 15px;
+        }
+
+        .change-item {
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+        }
+
+        .field-name {
+            font-weight: 600;
+            color: #666;
+            min-width: 80px;
+        }
+
+        .old-value {
+            background: rgba(220, 53, 69, 0.1);
+            color: #dc3545;
+            padding: 2px 6px;
+            border-radius: 4px;
+            text-decoration: line-through;
+        }
+
+        .new-value {
+            background: rgba(40, 167, 69, 0.1);
+            color: #28a745;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        .arrow {
+            color: #666;
+            font-weight: bold;
+        }
+
+        .record-details {
+            color: #666;
+            font-size: 13px;
+            margin-left: 15px;
+        }
+
+        .summary-report {
+            max-height: 600px;
+            overflow-y: auto;
+        }
+
+        .summary-section {
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #e9ecef;
+            margin-bottom: 20px;
+            padding: 20px;
+        }
+
+        .summary-section h3 {
+            margin: 0 0 20px 0;
+            color: #333;
+        }
+
+        .summary-section h4 {
+            margin: 0 0 15px 0;
+            color: #333;
+            font-size: 16px;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+        }
+
+        .summary-card {
+            text-align: center;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border: 1px solid #e9ecef;
+        }
+
+        .summary-number {
+            font-size: 28px;
+            font-weight: 700;
+            color: #4a90e2;
+            margin-bottom: 5px;
+        }
+
+        .summary-label {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .field-changes {
+            space-y: 15px;
+        }
+
+        .field-change-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .field-change-item .field-name {
+            min-width: 100px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .change-bar {
+            flex: 1;
+            height: 20px;
+            background: #f0f0f0;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .change-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4a90e2, #357abd);
+            transition: width 0.3s ease;
+        }
+
+        .change-count {
+            min-width: 80px;
+            font-size: 13px;
+            color: #666;
+            text-align: right;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="tabs-container">
+            <div class="tabs">
+                <div class="tab active" onclick="switchTab('search')">Financial Search</div>
+                <div class="tab" onclick="switchTab('errors')">Error Summary</div>
+                <div class="tab" onclick="switchTab('comparator')">Comparator Tool</div>
+            </div>
+        </div>
+
+        <div class="search-header">
+            <input type="text" class="search-box" id="globalSearchBox" placeholder="Search across all data...">
+        </div>
+
+        <div id="searchTab" class="tab-content active">
+            <div class="content-wrapper">
+                <div class="sidebar">
+                    <div class="file-list" id="fileList">
+                        <!-- Files will be populated here -->
+                    </div>
+                    <div class="upload-section">
+                        <button class="upload-btn" onclick="document.getElementById('fileInput').click()">
+                            📁 Upload Excel Files
+                        </button>
+                        <input type="file" id="fileInput" class="file-input" multiple accept=".xlsx,.xls" onchange="handleFileUpload(event)">
+                    </div>
+                </div>
+
+                <div class="main-content">
+                    <div class="content-header">
+                        <div class="content-title" id="contentTitle">Select a file to view data</div>
+                        <div class="content-subtitle" id="contentSubtitle">Upload Excel files and use the search to filter results</div>
+                    </div>
+                    <div class="data-table-container" id="dataContainer">
+                        <div class="empty-state">
+                            <div class="empty-state-icon">📊</div>
+                            <h3>No file selected</h3>
+                            <p>Upload Excel files and select one from the left to view its contents</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="errorsTab" class="tab-content">
+            <div class="error-summary-content">
+                <div class="content-header">
+                    <div class="content-title">Error Summary Report</div>
+                    <div class="content-subtitle">Data validation and quality issues across all worksheets</div>
+                </div>
+                
+                <div class="worksheet-tabs">
+                    <div class="worksheet-tab active" onclick="switchWorksheet('Data Validation Errors')">Data Validation Errors</div>
+                    <div class="worksheet-tab" onclick="switchWorksheet('Missing Data')">Missing Data</div>
+                    <div class="worksheet-tab" onclick="switchWorksheet('Format Errors')">Format Errors</div>
+                    <div class="worksheet-tab" onclick="switchWorksheet('Duplicate Records')">Duplicate Records</div>
+                </div>
+                
+                <div class="data-table-container" id="errorDataContainer">
+                    <!-- Error data will be populated here -->
+                </div>
+            </div>
+        </div>
+
+        <div id="comparatorTab" class="tab-content">
+            <div class="content-wrapper">
+                <div class="sidebar">
+                    <div style="padding: 20px; border-bottom: 1px solid #e9ecef;">
+                        <h3 style="margin-bottom: 15px; color: #333;">File Selection</h3>
+                        
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #666;">File A (Base)</label>
+                            <select id="fileASelect" class="file-select" onchange="selectComparisonFile('A', this.value)">
+                                <option value="">Select file...</option>
+                            </select>
+                        </div>
+                        
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #666;">File B (Compare)</label>
+                            <select id="fileBSelect" class="file-select" onchange="selectComparisonFile('B', this.value)">
+                                <option value="">Select file...</option>
+                            </select>
+                        </div>
+                        
+                        <button class="compare-btn" onclick="performComparison()" id="compareBtn">
+                            🔍 Compare Files
+                        </button>
+                    </div>
+                    
+                    <div style="padding: 20px;">
+                        <h4 style="margin-bottom: 15px; color: #333;">Comparison Options</h4>
+                        
+                        <div style="margin-bottom: 15px;">
+                            <label style="display: flex; align-items: center; cursor: pointer;">
+                                <input type="checkbox" checked style="margin-right: 8px;">
+                                <span style="font-size: 14px;">Show only differences</span>
+                            </label>
+                        </div>
+                        
+                        <div style="margin-bottom: 15px;">
+                            <label style="display: flex; align-items: center; cursor: pointer;">
+                                <input type="checkbox" checked style="margin-right: 8px;">
+                                <span style="font-size: 14px;">Highlight changes</span>
+                            </label>
+                        </div>
+                        
+                        <div style="margin-bottom: 15px;">
+                            <label style="display: flex; align-items: center; cursor: pointer;">
+                                <input type="checkbox" style="margin-right: 8px;">
+                                <span style="font-size: 14px;">Include new records</span>
+                            </label>
+                        </div>
+                        
+                        <div style="margin-bottom: 15px;">
+                            <label style="display: flex; align-items: center; cursor: pointer;">
+                                <input type="checkbox" style="margin-right: 8px;">
+                                <span style="font-size: 14px;">Include deleted records</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div style="padding: 20px; border-top: 1px solid #e9ecef; background: #f8f9fa;">
+                        <div class="comparison-stats">
+                            <div class="stat-item">
+                                <span class="stat-label">Total Changes:</span>
+                                <span class="stat-value" id="totalChanges">247</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Modified:</span>
+                                <span class="stat-value modified" id="modifiedCount">189</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Added:</span>
+                                <span class="stat-value added" id="addedCount">34</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Removed:</span>
+                                <span class="stat-value removed" id="removedCount">24</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="main-content">
+                    <div class="content-header">
+                        <div class="content-title" id="comparatorTitle">File Comparison Results</div>
+                        <div class="content-subtitle" id="comparatorSubtitle">major_banks_portfolio_2024.xlsx vs major_banks_portfolio_2024_updated.xlsx</div>
+                    </div>
+                    
+                    <div class="comparison-tabs">
+                        <div class="comparison-tab active" onclick="switchComparisonView('side-by-side')">Side by Side</div>
+                        <div class="comparison-tab" onclick="switchComparisonView('unified')">Unified View</div>
+                        <div class="comparison-tab" onclick="switchComparisonView('summary')">Summary Report</div>
+                    </div>
+                    
+                    <div class="data-table-container" id="comparisonContainer">
+                        <div id="sideBySideView" class="comparison-view active">
+                            <table class="comparison-table">
+                                <thead>
+                                    <tr>
+                                        <th rowspan="2" style="border-right: 2px solid #4a90e2;">Field</th>
+                                        <th colspan="2" style="text-align: center; background: #e8f4fd;">File A (Base)</th>
+                                        <th colspan="2" style="text-align: center; background: #fff2e8;">File B (Compare)</th>
+                                        <th rowspan="2">Status</th>
+                                    </tr>
+                                    <tr>
+                                        <th style="background: #e8f4fd;">JPMorgan Chase</th>
+                                        <th style="background: #e8f4fd;">Bank of America</th>
+                                        <th style="background: #fff2e8;">JPMorgan Chase</th>
+                                        <th style="background: #fff2e8;">Bank of America</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td style="font-weight: 600; border-right: 2px solid #4a90e2;">BankName</td>
+                                        <td>JPMorgan Chase & Co.</td>
+                                        <td>Bank of America</td>
+                                        <td>JPMorgan Chase & Co.</td>
+                                        <td>Bank of America Corp</td>
+                                        <td><span class="status-badge modified">Modified</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td style="font-weight: 600; border-right: 2px solid #4a90e2;">Assets</td>
+                                        <td>3,743,567,000,000</td>
+                                        <td>3,169,495,000,000</td>
+                                        <td style="background: #ffe6e6;">3,875,392,000,000</td>
+                                        <td style="background: #ffe6e6;">3,298,654,000,000</td>
+                                        <td><span class="status-badge modified">Modified</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td style="font-weight: 600; border-right: 2px solid #4a90e2;">Location</td>
+                                        <td>New York, NY</td>
+                                        <td>Charlotte, NC</td>
+                                        <td>New York, NY</td>
+                                        <td>Charlotte, NC</td>
+                                        <td><span class="status-badge unchanged">Unchanged</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td style="font-weight: 600; border-right: 2px solid #4a90e2;">Rating</td>
+                                        <td>A+</td>
+                                        <td>A</td>
+                                        <td style="background: #ffe6e6;">AA-</td>
+                                        <td>A</td>
+                                        <td><span class="status-badge modified">Modified</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td style="font-weight: 600; border-right: 2px solid #4a90e2;">Employees</td>
+                                        <td>293,723</td>
+                                        <td>216,823</td>
+                                        <td style="background: #ffe6e6;">295,891</td>
+                                        <td style="background: #ffe6e6;">218,456</td>
+                                        <td><span class="status-badge modified">Modified</span></td>
+                                    </tr>
+                                    <tr style="background: #e8f5e8;">
+                                        <td style="font-weight: 600; border-right: 2px solid #4a90e2;">CEO</td>
+                                        <td>-</td>
+                                        <td>-</td>
+                                        <td>Jamie Dimon</td>
+                                        <td>Brian Moynihan</td>
+                                        <td><span class="status-badge added">Added</span></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <div id="unifiedView" class="comparison-view">
+                            <div class="unified-comparison">
+                                <div class="diff-section">
+                                    <h4>🔄 Modified Records (189)</h4>
+                                    <div class="diff-item">
+                                        <div class="diff-header">Record: JPMorgan Chase & Co. (Row 1)</div>
+                                        <div class="diff-changes">
+                                            <div class="change-item">
+                                                <span class="field-name">Assets:</span>
+                                                <span class="old-value">3,743,567,000,000</span>
+                                                <span class="arrow">→</span>
+                                                <span class="new-value">3,875,392,000,000</span>
+                                            </div>
+                                            <div class="change-item">
+                                                <span class="field-name">Employees:</span>
+                                                <span class="old-value">293,723</span>
+                                                <span class="arrow">→</span>
+                                                <span class="new-value">295,891</span>
+                                            </div>
+                                            <div class="change-item">
+                                                <span class="field-name">Rating:</span>
+                                                <span class="old-value">A+</span>
+                                                <span class="arrow">→</span>
+                                                <span class="new-value">AA-</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="diff-section">
+                                    <h4>➕ Added Records (34)</h4>
+                                    <div class="diff-item added">
+                                        <div class="diff-header">New Record: First Republic Bank</div>
+                                        <div class="record-details">
+                                            Assets: $212,000,000,000 | Location: San Francisco, CA | Rating: A+ | Employees: 7,200
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="diff-section">
+                                    <h4>➖ Removed Records (24)</h4>
+                                    <div class="diff-item removed">
+                                        <div class="diff-header">Deleted Record: Silicon Valley Bank</div>
+                                        <div class="record-details">
+                                            Assets: $209,000,000,000 | Location: Santa Clara, CA | Rating: BBB+ | Employees: 8,500
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div id="summaryView" class="comparison-view">
+                            <div class="summary-report">
+                                <div class="summary-section">
+                                    <h3>📊 Comparison Summary</h3>
+                                    <div class="summary-grid">
+                                        <div class="summary-card">
+                                            <div class="summary-number">247</div>
+                                            <div class="summary-label">Total Changes</div>
+                                        </div>
+                                        <div class="summary-card">
+                                            <div class="summary-number">76.5%</div>
+                                            <div class="summary-label">Modified</div>
+                                        </div>
+                                        <div class="summary-card">
+                                            <div class="summary-number">13.8%</div>
+                                            <div class="summary-label">Added</div>
+                                        </div>
+                                        <div class="summary-card">
+                                            <div class="summary-number">9.7%</div>
+                                            <div class="summary-label">Removed</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="summary-section">
+                                    <h4>📈 Most Changed Fields</h4>
+                                    <div class="field-changes">
+                                        <div class="field-change-item">
+                                            <span class="field-name">Assets</span>
+                                            <div class="change-bar">
+                                                <div class="change-fill" style="width: 89%;"></div>
+                                            </div>
+                                            <span class="change-count">156 changes</span>
+                                        </div>
+                                        <div class="field-change-item">
+                                            <span class="field-name">Employees</span>
+                                            <div class="change-bar">
+                                                <div class="change-fill" style="width: 67%;"></div>
+                                            </div>
+                                            <span class="change-count">117 changes</span>
+                                        </div>
+                                        <div class="field-change-item">
+                                            <span class="field-name">Rating</span>
+                                            <div class="change-bar">
+                                                <div class="change-fill" style="width: 34%;"></div>
+                                            </div>
+                                            <span class="change-count">59 changes</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let filesData = {};
+        let currentSearchTerm = '';
+        let selectedFile = null;
+        let currentWorksheet = 'Data Validation Errors';
+        let comparisonFiles = { A: null, B: null };
+        let currentComparisonView = 'side-by-side';
+
+        // Realistic financial data with real bank names and institutions
+        const sampleData = {
+            'major_us_banks_2024.xlsx': [
+                { BankName: 'JPMorgan Chase & Co.', Assets: 3743567000000, Location: 'New York, NY', Rating: 'A+', Employees: 293723, Founded: 1799, CEO: 'Jamie Dimon' },
+                { BankName: 'Bank of America', Assets: 3169495000000, Location: 'Charlotte, NC', Rating: 'A', Employees: 216823, Founded: 1904, CEO: 'Brian Moynihan' },
+                { BankName: 'Wells Fargo', Assets: 1886267000000, Location: 'San Francisco, CA', Rating: 'A-', Employees: 238698, Founded: 1852, CEO: 'Charles Scharf' },
+                { BankName: 'Citigroup', Assets: 2416676000000, Location: 'New York, NY', Rating: 'A', Employees: 238104, Founded: 1812, CEO: 'Jane Fraser' },
+                { BankName: 'U.S. Bancorp', Assets: 590776000000, Location: 'Minneapolis, MN', Rating: 'AA-', Employees: 74000, Founded: 1863, CEO: 'Andy Cecere' },
+                { BankName: 'PNC Financial Services', Assets: 560109000000, Location: 'Pittsburgh, PA', Rating: 'A+', Employees: 52518, Founded: 1845, CEO: 'William Demchak' },
+                { BankName: 'Goldman Sachs', Assets: 1616318000000, Location: 'New York, NY', Rating: 'A', Employees: 49100, Founded: 1869, CEO: 'David Solomon' },
+                { BankName: 'Morgan Stanley', Assets: 1199199000000, Location: 'New York, NY', Rating: 'A+', Employees: 75000, Founded: 1935, CEO: 'James Gorman' }
+            ],
+            'investment_firms_2024.xlsx': [
+                { FirmName: 'BlackRock', AUM: 10009000000000, Location: 'New York, NY', Type: 'Asset Management', Founded: 1988, CEO: 'Larry Fink' },
+                { FirmName: 'Vanguard Group', AUM: 8100000000000, Location: 'Malvern, PA', Type: 'Asset Management', Founded: 1975, CEO: 'Tim Buckley' },
+                { FirmName: 'State Street Global', AUM: 4140000000000, Location: 'Boston, MA', Type: 'Custody Bank', Founded: 1792, CEO: 'Ronald O\'Hanley' },
+                { FirmName: 'Fidelity Investments', AUM: 4500000000000, Location: 'Boston, MA', Type: 'Asset Management', Founded: 1946, CEO: 'Abigail Johnson' },
+                { FirmName: 'BNY Mellon', AUM: 2400000000000, Location: 'New York, NY', Type: 'Custody Bank', Founded: 1784, CEO: 'Robin Vince' },
+                { FirmName: 'Charles Schwab', AUM: 8140000000000, Location: 'Westlake, TX', Type: 'Brokerage', Founded: 1971, CEO: 'Walt Bettinger' }
+            ],
+            'credit_unions_2024.xlsx': [
+                { UnionName: 'Navy Federal Credit Union', Members: 13000000, Location: 'Vienna, VA', Assets: 165000000000, Type: 'Federal', Founded: 1933 },
+                { UnionName: 'State Employees Credit Union', Members: 2600000, Location: 'Raleigh, NC', Assets: 50000000000, Type: 'State', Founded: 1937 },
+                { UnionName: 'Pentagon Federal Credit Union', Members: 2400000, Location: 'McLean, VA', Assets: 34000000000, Type: 'Federal', Founded: 1935 },
+                { UnionName: 'Boeing Employees Credit Union', Members: 1300000, Location: 'Tukwila, WA', Assets: 25000000000, Type: 'Corporate', Founded: 1935 },
+                { UnionName: 'SchoolsFirst Federal Credit Union', Members: 1200000, Location: 'Santa Ana, CA', Assets: 26000000000, Type: 'Educational', Founded: 1934 }
+            ],
+            'international_banks_2024.xlsx': [
+                { BankName: 'HSBC Holdings', Country: 'United Kingdom', Assets: 2958000000000, Branches: 3800, Established: 1865, CEO: 'Noel Quinn' },
+                { BankName: 'BNP Paribas', Country: 'France', Assets: 2844000000000, Branches: 2200, Established: 1848, CEO: 'Jean-Laurent Bonnafé' },
+                { BankName: 'Deutsche Bank', Country: 'Germany', Assets: 1324000000000, Branches: 1800, Established: 1870, CEO: 'Christian Sewing' },
+                { BankName: 'Barclays', Country: 'United Kingdom', Assets: 1631000000000, Branches: 1600, Established: 1690, CEO: 'C.S. Venkatakrishnan' },
+                { BankName: 'UBS Group', Country: 'Switzerland', Assets: 1118000000000, Branches: 4150, Established: 1862, CEO: 'Ralph Hamers' },
+                { BankName: 'Royal Bank of Canada', Country: 'Canada', Assets: 1540000000000, Branches: 1300, Established: 1869, CEO: 'Dave McKay' }
+            ],
+            'comprehensive_bank_data_2024.xlsx': [
+                { 
+                    BankName: 'JPMorgan Chase & Co.', 
+                    Assets: 3743567000000, 
+                    Liabilities: 3402891000000, 
+                    Equity: 340676000000, 
+                    Revenue: 162348000000,
+                    NetIncome: 49552000000,
+                    ROA: 1.32,
+                    ROE: 14.5,
+                    Employees: 293723,
+                    Branches: 4900,
+                    ATMs: 16000,
+                    Location: 'New York, NY',
+                    Country: 'USA',
+                    Established: 1799,
+                    CEO: 'Jamie Dimon',
+                    Rating_SP: 'A+',
+                    Rating_Moody: 'Aa2',
+                    Rating_Fitch: 'A+',
+                    Deposits: 2954919000000,
+                    Loans: 1186078000000,
+                    NPL_Ratio: 0.26,
+                    CapitalRatio: 15.0,
+                    LiquidityRatio: 24.2,
+                    CostIncomeRatio: 57.8,
+                    NetInterestMargin: 2.28,
+                    BookValue: 115.50,
+                    MarketCap: 478900000000,
+                    PriceToBook: 1.41,
+                    DividendYield: 2.45,
+                    BetaCoeff: 1.15
+                },
+                { 
+                    BankName: 'Bank of America', 
+                    Assets: 3169495000000, 
+                    Liabilities: 2885629000000, 
+                    Equity: 283866000000, 
+                    Revenue: 90208000000,
+                    NetIncome: 31978000000,
+                    ROA: 1.01,
+                    ROE: 11.3,
+                    Employees: 216823,
+                    Branches: 3900,
+                    ATMs: 16000,
+                    Location: 'Charlotte, NC',
+                    Country: 'USA',
+                    Established: 1904,
+                    CEO: 'Brian Moynihan',
+                    Rating_SP: 'A',
+                    Rating_Moody: 'A1',
+                    Rating_Fitch: 'A',
+                    Deposits: 1947317000000,
+                    Loans: 1062000000000,
+                    NPL_Ratio: 0.37,
+                    CapitalRatio: 13.8,
+                    LiquidityRatio: 21.4,
+                    CostIncomeRatio: 66.2,
+                    NetInterestMargin: 1.97,
+                    BookValue: 33.12,
+                    MarketCap: 268400000000,
+                    PriceToBook: 0.95,
+                    DividendYield: 2.38,
+                    BetaCoeff: 1.25
+                }
+            ]
+        };
+
+        // Generate additional realistic data
+        const generateRealisticData = () => {
+            const realBankNames = [
+                'Truist Financial', 'TD Bank', 'Capital One', 'Fifth Third Bank', 'KeyBank', 'Regions Bank',
+                'Huntington National Bank', 'M&T Bank', 'Zions Bancorp', 'First Citizens Bank',
+                'Comerica Bank', 'Western Alliance Bank', 'Popular Inc', 'Synovus Financial',
+                'First Horizon Bank', 'Associated Banc-Corp', 'East West Bank', 'First Republic Bank',
+                'SVB Financial Group', 'Signature Bank', 'New York Community Bank', 'Webster Financial',
+                'United Community Banks', 'Independent Bank Group', 'Texas Capital Bancshares'
+            ];
+
+            const locations = [
+                'Charlotte, NC', 'New York, NY', 'San Francisco, CA', 'Chicago, IL', 'Boston, MA',
+                'Miami, FL', 'Atlanta, GA', 'Dallas, TX', 'Philadelphia, PA', 'Denver, CO',
+                'Seattle, WA', 'Phoenix, AZ', 'Detroit, MI', 'Minneapolis, MN', 'Cleveland, OH'
+            ];
+
+            const ratings = ['AAA', 'AA+', 'AA', 'AA-', 'A+', 'A', 'A-', 'BBB+', 'BBB', 'BBB-'];
+            
+            sampleData['regional_banks_analysis_2024.xlsx'] = realBankNames.map((name, i) => ({
+                BankName: name,
+                Assets: Math.floor(Math.random() * 200000000000) + 50000000000,
+                Location: locations[i % locations.length],
+                Rating: ratings[i % ratings.length],
+                Employees: Math.floor(Math.random() * 25000) + 5000,
+                Founded: Math.floor(Math.random() * 50) + 1970,
+                CEO: `CEO of ${name.split(' ')[0]}`,
+                Branches: Math.floor(Math.random() * 500) + 100
+            }));
+
+            const europeNames = [
+                'Crédit Agricole', 'Banco Santander', 'ING Group', 'Société Générale', 'UniCredit',
+                'Intesa Sanpaolo', 'Standard Chartered', 'Lloyds Banking Group', 'NatWest Group',
+                'Nordea Bank', 'Danske Bank', 'ABN AMRO', 'KBC Group', 'Commerzbank',
+                'Rabobank', 'CaixaBank', 'BBVA', 'Credit Suisse', 'Erste Group', 'AIB Group',
+                'Bank of Ireland', 'Swedbank'
+            ];
+
+            const europeanCountries = [
+                'France', 'Spain', 'Netherlands', 'Italy', 'United Kingdom', 'Germany',
+                'Belgium', 'Sweden', 'Denmark', 'Austria', 'Ireland', 'Switzerland'
+            ];
+
+            sampleData['european_banks_2024.xlsx'] = europeNames.map((name, i) => ({
+                BankName: name,
+                Country: europeanCountries[i % europeanCountries.length],
+                Assets: Math.floor(Math.random() * 2000000000000) + 100000000000,
+                Currency: i % 4 === 3 ? (i % 8 === 3 ? 'CHF' : 'GBP') : 'EUR',
+                Employees: Math.floor(Math.random() * 80000) + 20000,
+                Established: Math.floor(Math.random() * 200) + 1800,
+                CEO: `CEO of ${name.split(' ')[0]}`
+            }));
+
+            const asianNames = [
+                'Industrial and Commercial Bank of China', 'China Construction Bank', 'Agricultural Bank of China',
+                'Bank of China', 'Mitsubishi UFJ Financial Group', 'Sumitomo Mitsui Financial Group',
+                'Mizuho Financial Group', 'China Development Bank', 'Postal Savings Bank of China',
+                'Bank of Communications', 'China Merchants Bank', 'Industrial Bank', 'CITIC Bank',
+                'China Minsheng Bank', 'Ping An Bank', 'China Everbright Bank', 'Hua Xia Bank',
+                'Shanghai Pudong Development Bank', 'Bank of Beijing', 'China Zheshang Bank',
+                'DBS Bank', 'Oversea-Chinese Banking Corp', 'United Overseas Bank', 'CIMB Group',
+                'Malayan Banking', 'Bangkok Bank', 'Kasikornbank', 'Siam Commercial Bank',
+                'Bank Mandiri', 'Bank Central Asia'
+            ];
+
+            const asianCountries = [
+                'China', 'Japan', 'Singapore', 'Malaysia', 'Thailand', 'Indonesia',
+                'South Korea', 'Hong Kong', 'Taiwan', 'Philippines'
+            ];
+
+            sampleData['asian_financial_institutions_2024.xlsx'] = asianNames.map((name, i) => ({
+                InstitutionName: name,
+                Country: asianCountries[i % asianCountries.length],
+                Assets: Math.floor(Math.random() * 4000000000000) + 200000000000,
+                Type: ['Commercial Bank', 'Development Bank', 'Investment Bank'][i % 3],
+                Employees: Math.floor(Math.random() * 150000) + 20000,
+                Founded: Math.floor(Math.random() * 100) + 1920
+            }));
+
+            const creditCardCompanies = [
+                'Visa Inc.', 'Mastercard Inc.', 'American Express', 'Discover Financial Services',
+                'Capital One', 'Chase Card Services', 'Citi Cards', 'Bank of America Cards',
+                'Wells Fargo Cards', 'U.S. Bank Cards', 'Barclays US Consumer Bank',
+                'Synchrony Financial', 'Navy Federal Credit Union Cards', 'USAA Cards',
+                'Pentagon Federal Credit Union Cards', 'Apple Card (Goldman Sachs)',
+                'Amazon Store Card', 'Target RedCard', 'Costco Anywhere Visa',
+                'Home Depot Consumer Credit Card'
+            ];
+
+            sampleData['credit_card_companies_2024.xlsx'] = creditCardCompanies.map((name, i) => ({
+                CompanyName: name,
+                Revenue: Math.floor(Math.random() * 20000000000) + 2000000000,
+                CardholderBase: Math.floor(Math.random() * 100000000) + 10000000,
+                Location: locations[i % locations.length],
+                MarketShare: (Math.random() * 25 + 2).toFixed(2) + '%',
+                Founded: Math.floor(Math.random() * 60) + 1960
+            }));
+
+            const insuranceCompanies = [
+                'Berkshire Hathaway', 'UnitedHealth Group', 'Anthem Inc.', 'Aetna (CVS Health)',
+                'Cigna Corporation', 'Humana Inc.', 'MetLife Inc.', 'Prudential Financial',
+                'New York Life', 'Northwestern Mutual', 'MassMutual', 'TIAA',
+                'Lincoln National', 'Principal Financial Group', 'Aflac Inc.',
+                'Allstate Corporation', 'Progressive Corporation', 'State Farm',
+                'GEICO', 'Liberty Mutual', 'Travelers Companies', 'Hartford Financial',
+                'AIG (American International Group)', 'Chubb Limited', 'Zurich Insurance',
+                'Munich Re', 'Swiss Re', 'Allianz SE'
+            ];
+
+            sampleData['insurance_companies_2024.xlsx'] = insuranceCompanies.map((name, i) => ({
+                CompanyName: name,
+                Assets: Math.floor(Math.random() * 800000000000) + 50000000000,
+                Premiums: Math.floor(Math.random() * 200000000000) + 10000000000,
+                Location: locations[i % locations.length],
+                Type: ['Life', 'Health', 'Property & Casualty', 'Reinsurance'][i % 4],
+                Founded: Math.floor(Math.random() * 150) + 1850,
+                CEO: `CEO of ${name.split(' ')[0]}`
+            }));
+
+            const mutualFunds = [
+                'Vanguard 500 Index Fund', 'Fidelity Contrafund', 'American Funds Growth Fund',
+                'Vanguard Total Stock Market Index', 'American Funds Income Fund',
+                'Fidelity Magellan Fund', 'Vanguard Wellington Fund', 'T. Rowe Price Blue Chip Growth',
+                'American Funds Washington Mutual', 'Dodge & Cox Stock Fund', 'Vanguard Windsor Fund',
+                'Fidelity Puritan Fund', 'American Funds Investment Company', 'PIMCO Total Return Fund',
+                'Vanguard PRIMECAP Fund', 'Fidelity Low-Priced Stock Fund', 'American Funds EuroPacific Growth',
+                'T. Rowe Price Growth Stock Fund', 'Vanguard Energy Fund', 'Fidelity Select Technology',
+                'American Funds Smallcap World Fund', 'Vanguard Health Care Fund',
+                'T. Rowe Price Science & Technology', 'Fidelity Select Biotechnology',
+                'American Funds New Perspective Fund', 'Vanguard Dividend Growth Fund',
+                'T. Rowe Price Equity Income Fund', 'Fidelity Balanced Fund',
+                'American Funds Balanced Fund', 'Vanguard Target Retirement 2050',
+                'T. Rowe Price Retirement 2040', 'Fidelity Freedom 2030 Fund',
+                'American Funds Target Date 2035', 'Vanguard International Growth',
+                'T. Rowe Price International Stock Fund'
+            ];
+
+            sampleData['mutual_funds_2024.xlsx'] = mutualFunds.map((name, i) => ({
+                FundName: name,
+                AUM: Math.floor(Math.random() * 300000000000) + 5000000000,
+                ExpenseRatio: (Math.random() * 1.5 + 0.05).toFixed(3) + '%',
+                YTDReturn: (Math.random() * 30 - 10).toFixed(2) + '%',
+                Category: ['Large Cap Equity', 'Small Cap Equity', 'International Equity', 'Bond Fund', 'Balanced Fund', 'Target Date'][i % 6],
+                Manager: ['Vanguard', 'Fidelity', 'American Funds', 'T. Rowe Price', 'PIMCO', 'Dodge & Cox'][i % 6],
+                Inception: Math.floor(Math.random() * 50) + 1970
+            }));
+
+            const pensionFunds = [
+                'California Public Employees Retirement System', 'California State Teachers Retirement System',
+                'New York State Common Retirement Fund', 'Florida Retirement System',
+                'Teacher Retirement System of Texas', 'New York City Employees Retirement System',
+                'State of Wisconsin Investment Board', 'Washington State Investment Board',
+                'Pennsylvania Public School Employees', 'Ohio Public Employees Retirement System',
+                'Michigan Public School Employees', 'Illinois Teachers Retirement System',
+                'Georgia Teachers Retirement System', 'North Carolina Retirement Systems',
+                'Virginia Retirement System', 'Colorado Public Employees Retirement',
+                'Oregon Public Employees Retirement Fund', 'Minnesota State Retirement System',
+                'Maryland State Retirement System', 'Massachusetts Pension Reserves Investment',
+                'Connecticut Retirement Plans', 'New Jersey Division of Pensions',
+                'Arizona State Retirement System', 'Nevada Public Employees Retirement'
+            ];
+
+            sampleData['pension_funds_2024.xlsx'] = pensionFunds.map((name, i) => ({
+                FundName: name,
+                Assets: Math.floor(Math.random() * 500000000000) + 20000000000,
+                Participants: Math.floor(Math.random() * 2000000) + 100000,
+                State: name.includes('California') ? 'California' : 
+                       name.includes('New York') ? 'New York' : 
+                       name.includes('Florida') ? 'Florida' :
+                       name.includes('Texas') ? 'Texas' : locations[i % locations.length].split(', ')[1],
+                Type: ['Public Employee', 'Teacher', 'State Employee'][i % 3],
+                FundedRatio: (Math.random() * 40 + 60).toFixed(1) + '%',
+                EstablishedYear: Math.floor(Math.random() * 80) + 1940
+            }));
+
+            const hedgeFunds = [
+                'Bridgewater Associates', 'AQR Capital Management', 'Renaissance Technologies',
+                'Man Group', 'Two Sigma Investments', 'Millennium Management',
+                'Citadel LLC', 'Elliott Management', 'DE Shaw & Co', 'Baupost Group',
+                'Third Point LLC', 'Pershing Square Capital', 'Tiger Global Management',
+                'Coatue Management', 'Point72 Asset Management', 'Lone Pine Capital',
+                'Viking Global Investors', 'Paulson & Co', 'Och-Ziff Capital Management',
+                'Farallon Capital Management', 'Canyon Capital Advisors', 'Blackstone Alternative',
+                'Apollo Global Management', 'KKR & Co', 'Carlyle Group', 'Warburg Pincus'
+            ];
+
+            sampleData['hedge_funds_2024.xlsx'] = hedgeFunds.map((name, i) => ({
+                FundName: name,
+                AUM: Math.floor(Math.random() * 150000000000) + 5000000000,
+                Strategy: ['Long/Short Equity', 'Event Driven', 'Global Macro', 'Relative Value', 'Multi-Strategy'][i % 5],
+                Location: ['New York, NY', 'Greenwich, CT', 'London, UK', 'Hong Kong', 'Singapore'][i % 5],
+                Founded: Math.floor(Math.random() * 40) + 1980,
+                MinInvestment: Math.floor(Math.random() * 50000000) + 1000000,
+                ManagementFee: (Math.random() * 1.5 + 1).toFixed(2) + '%'
+            }));
+
+            const fintechCompanies = [
+                'Stripe', 'Square (Block)', 'PayPal', 'Robinhood', 'Coinbase', 'Klarna',
+                'Chime', 'SoFi', 'Affirm', 'Plaid', 'Marqeta', 'Adyen', 'Ant Group',
+                'Revolut', 'Nubank', 'Checkout.com', 'Wise', 'Afterpay', 'Toast',
+                'Brex', 'Mercury', 'Ramp', 'Navan', 'Zip Co', 'Paidy', 'GoCardless',
+                'TrueLayer', 'Zopa', 'Monzo', 'N26', 'Starling Bank', 'Tinkoff Bank'
+            ];
+
+            sampleData['fintech_companies_2024.xlsx'] = fintechCompanies.map((name, i) => ({
+                CompanyName: name,
+                Valuation: Math.floor(Math.random() * 95000000000) + 500000000,
+                LastFunding: Math.floor(Math.random() * 2000000000) + 50000000,
+                Sector: ['Payments', 'Digital Banking', 'Lending', 'Investing', 'Crypto', 'B2B Financial Services'][i % 6],
+                Location: ['San Francisco, CA', 'New York, NY', 'London, UK', 'Berlin, Germany', 'Stockholm, Sweden', 'São Paulo, Brazil'][i % 6],
+                Founded: Math.floor(Math.random() * 20) + 2005,
+                CEO: `CEO of ${name.split(' ')[0]}`
+            }));
+
+            const cryptoExchanges = [
+                'Binance', 'Coinbase Pro', 'FTX', 'Kraken', 'Huobi Global', 'KuCoin',
+                'Gate.io', 'Crypto.com Exchange', 'Bitfinex', 'OKX', 'Bybit', 'Gemini',
+                'Bitstamp', 'Bittrex', 'Poloniex', 'BitMEX', 'Deribit', 'CoinList Pro',
+                'LMAX Digital', 'itBit', 'Liquid'
+            ];
+
+            sampleData['cryptocurrency_exchanges_2024.xlsx'] = cryptoExchanges.map((name, i) => ({
+                ExchangeName: name,
+                DailyVolume: Math.floor(Math.random() * 10000000000) + 100000000,
+                Users: Math.floor(Math.random() * 50000000) + 1000000,
+                Location: ['Malta', 'United States', 'Bahamas', 'United Kingdom', 'Singapore', 'Seychelles'][i % 6],
+                Founded: Math.floor(Math.random() * 15) + 2010,
+                SupportedCoins: Math.floor(Math.random() * 400) + 100,
+                CEO: `CEO of ${name.split(' ')[0]}`
+            }));
+
+            const mortgageLenders = [
+                'Quicken Loans (Rocket Mortgage)', 'Wells Fargo Home Mortgage', 'Chase Home Lending',
+                'Bank of America Home Loans', 'Caliber Home Loans', 'United Wholesale Mortgage',
+                'Freedom Mortgage', 'loanDepot', 'Guaranteed Rate', 'CrossCountry Mortgage',
+                'PennyMac Loan Services', 'Mr. Cooper', 'Stearns Lending', 'Guild Mortgage',
+                'Movement Mortgage', 'PrimeLending', 'Flagstar Bank', 'NewRez',
+                'AmeriHome Mortgage', 'Homebridge Financial Services', 'Carrington Mortgage Services',
+                'PHH Mortgage', 'CitiMortgage', 'U.S. Bank Home Mortgage', 'Truist Mortgage',
+                'Regions Mortgage', 'SunTrust Mortgage'
+            ];
+
+            sampleData['mortgage_lenders_2024.xlsx'] = mortgageLenders.map((name, i) => ({
+                LenderName: name,
+                LoansOriginated: Math.floor(Math.random() * 200000000000) + 10000000000,
+                MarketShare: (Math.random() * 15 + 0.5).toFixed(2) + '%',
+                Location: locations[i % locations.length],
+                Type: ['Bank', 'Non-Bank Lender', 'Credit Union'][i % 3],
+                AvgRate: (Math.random() * 2 + 6).toFixed(3) + '%',
+                Founded: Math.floor(Math.random() * 100) + 1920
+            }));
+
+            const privateEquityFirms = [
+                'Blackstone Group', 'Kohlberg Kravis Roberts', 'Apollo Global Management',
+                'Carlyle Group', 'TPG Inc.', 'Warburg Pincus', 'Bain Capital',
+                'CVC Capital Partners', 'EQT Partners', 'Advent International',
+                'Silver Lake Partners', 'Permira', 'Apax Partners', 'BC Partners',
+                'Leonard Green & Partners', 'Vista Equity Partners', 'General Atlantic',
+                'Hellman & Friedman', 'Thoma Bravo', 'Riverstone Holdings',
+                'Energy Capital Partners', 'Francisco Partners', 'GTCR'
+            ];
+
+            sampleData['private_equity_firms_2024.xlsx'] = privateEquityFirms.map((name, i) => ({
+                FirmName: name,
+                AUM: Math.floor(Math.random() * 800000000000) + 50000000000,
+                FundSize: Math.floor(Math.random() * 30000000000) + 2000000000,
+                Location: ['New York, NY', 'Boston, MA', 'San Francisco, CA', 'London, UK', 'Hong Kong'][i % 5],
+                Founded: Math.floor(Math.random() * 50) + 1970,
+                PortfolioCompanies: Math.floor(Math.random() * 200) + 20,
+                Sector: ['Technology', 'Healthcare', 'Financial Services', 'Industrial', 'Consumer', 'Energy'][i % 6]
+            }));
+        };
+
+        // Error Summary data with realistic financial institution names
+        const errorSummaryData = {
+            'Data Validation Errors': [
+                { RowNumber: 2, FieldName: 'BankName', ErrorType: 'Validation Error', Description: 'Invalid characters in JPMorgan Chase & Co. field', Severity: 'High', Status: 'Open' },
+                { RowNumber: 5, FieldName: 'Assets', ErrorType: 'Validation Error', Description: 'Negative asset value for Wells Fargo', Severity: 'High', Status: 'In Progress' },
+                { RowNumber: 8, FieldName: 'Location', ErrorType: 'Validation Error', Description: 'Invalid state code for Bank of America location', Severity: 'Medium', Status: 'Resolved' },
+                { RowNumber: 12, FieldName: 'Rating', ErrorType: 'Validation Error', Description: 'Non-standard rating format for Citigroup', Severity: 'Medium', Status: 'Open' },
+                { RowNumber: 15, FieldName: 'Employees', ErrorType: 'Validation Error', Description: 'Employee count exceeds reasonable limit for Goldman Sachs', Severity: 'Low', Status: 'In Progress' },
+                { RowNumber: 18, FieldName: 'Assets', ErrorType: 'Validation Error', Description: 'Asset format inconsistency for Morgan Stanley', Severity: 'High', Status: 'Open' },
+                { RowNumber: 21, FieldName: 'CEO', ErrorType: 'Validation Error', Description: 'Special characters in CEO name for U.S. Bancorp', Severity: 'Low', Status: 'Resolved' },
+                { RowNumber: 24, FieldName: 'Founded', ErrorType: 'Validation Error', Description: 'Future founding date for PNC Financial', Severity: 'High', Status: 'Open' },
+                { RowNumber: 27, FieldName: 'Rating', ErrorType: 'Validation Error', Description: 'Missing rating agency for Truist Financial', Severity: 'Medium', Status: 'In Progress' },
+                { RowNumber: 30, FieldName: 'Location', ErrorType: 'Validation Error', Description: 'Duplicate location entries for TD Bank', Severity: 'Low', Status: 'Open' },
+                { RowNumber: 33, FieldName: 'Assets', ErrorType: 'Validation Error', Description: 'Currency mismatch for Capital One assets', Severity: 'High', Status: 'In Progress' },
+                { RowNumber: 36, FieldName: 'Employees', ErrorType: 'Validation Error', Description: 'Zero employee count for Fifth Third Bank', Severity: 'High', Status: 'Open' },
+                { RowNumber: 39, FieldName: 'BankName', ErrorType: 'Validation Error', Description: 'Encoding issue in KeyBank name field', Severity: 'Medium', Status: 'Resolved' },
+                { RowNumber: 42, FieldName: 'CEO', ErrorType: 'Validation Error', Description: 'Missing CEO information for Regions Bank', Severity: 'Low', Status: 'Open' },
+                { RowNumber: 45, FieldName: 'Founded', ErrorType: 'Validation Error', Description: 'Invalid date format for Huntington National Bank', Severity: 'Medium', Status: 'In Progress' }
+            ],
+            'Missing Data': [
+                { RowNumber: 3, FieldName: 'Revenue', ErrorType: 'Missing Data', Description: 'Missing revenue data for BlackRock', Severity: 'High', Status: 'Open' },
+                { RowNumber: 7, FieldName: 'NetIncome', ErrorType: 'Missing Data', Description: 'Missing net income for Vanguard Group', Severity: 'High', Status: 'In Progress' },
+                { RowNumber: 11, FieldName: 'CEO', ErrorType: 'Missing Data', Description: 'Missing CEO name for State Street Global', Severity: 'Medium', Status: 'Open' },
+                { RowNumber: 14, FieldName: 'Established', ErrorType: 'Missing Data', Description: 'Missing establishment date for Fidelity Investments', Severity: 'Medium', Status: 'Resolved' },
+                { RowNumber: 17, FieldName: 'AUM', ErrorType: 'Missing Data', Description: 'Missing AUM data for BNY Mellon', Severity: 'High', Status: 'Open' },
+                { RowNumber: 20, FieldName: 'Employees', ErrorType: 'Missing Data', Description: 'Missing employee count for Charles Schwab', Severity: 'Medium', Status: 'In Progress' },
+                { RowNumber: 23, FieldName: 'Location', ErrorType: 'Missing Data', Description: 'Missing headquarters location for Navy Federal Credit Union', Severity: 'Low', Status: 'Open' },
+                { RowNumber: 26, FieldName: 'Members', ErrorType: 'Missing Data', Description: 'Missing member count for State Employees Credit Union', Severity: 'High', Status: 'In Progress' },
+                { RowNumber: 29, FieldName: 'Type', ErrorType: 'Missing Data', Description: 'Missing institution type for Pentagon Federal Credit Union', Severity: 'Medium', Status: 'Open' },
+                { RowNumber: 32, FieldName: 'Founded', ErrorType: 'Missing Data', Description: 'Missing founding year for Boeing Employees Credit Union', Severity: 'Low', Status: 'Resolved' },
+                { RowNumber: 35, FieldName: 'Assets', ErrorType: 'Missing Data', Description: 'Missing asset data for SchoolsFirst Federal Credit Union', Severity: 'High', Status: 'Open' },
+                { RowNumber: 38, FieldName: 'CEO', ErrorType: 'Missing Data', Description: 'Missing CEO information for HSBC Holdings', Severity: 'Medium', Status: 'In Progress' }
+            ],
+            'Format Errors': [
+                { RowNumber: 4, FieldName: 'Assets', ErrorType: 'Format Error', Description: 'Incorrect currency format for BNP Paribas assets', Severity: 'Medium', Status: 'Open' },
+                { RowNumber: 6, FieldName: 'Revenue', ErrorType: 'Format Error', Description: 'Scientific notation in Deutsche Bank revenue', Severity: 'Low', Status: 'Resolved' },
+                { RowNumber: 9, FieldName: 'Employees', ErrorType: 'Format Error', Description: 'Decimal places in Barclays employee count', Severity: 'Medium', Status: 'Open' },
+                { RowNumber: 13, FieldName: 'Founded', ErrorType: 'Format Error', Description: 'Text format in UBS Group founding date', Severity: 'Low', Status: 'In Progress' },
+                { RowNumber: 16, FieldName: 'Rating', ErrorType: 'Format Error', Description: 'Lowercase rating format for Royal Bank of Canada', Severity: 'Medium', Status: 'Open' },
+                { RowNumber: 19, FieldName: 'MarketCap', ErrorType: 'Format Error', Description: 'Missing currency symbol in Visa Inc. market cap', Severity: 'Low', Status: 'Resolved' },
+                { RowNumber: 22, FieldName: 'Revenue', ErrorType: 'Format Error', Description: 'Comma separator issue in Mastercard revenue', Severity: 'Medium', Status: 'Open' },
+                { RowNumber: 25, FieldName: 'CardholderBase', ErrorType: 'Format Error', Description: 'Text suffix in American Express cardholder base', Severity: 'Low', Status: 'In Progress' },
+                { RowNumber: 28, FieldName: 'MarketShare', ErrorType: 'Format Error', Description: 'Missing percentage sign for Discover Financial Services', Severity: 'Medium', Status: 'Open' },
+                { RowNumber: 31, FieldName: 'Assets', ErrorType: 'Format Error', Description: 'European number format in Berkshire Hathaway assets', Severity: 'Low', Status: 'Resolved' },
+                { RowNumber: 34, FieldName: 'Premiums', ErrorType: 'Format Error', Description: 'Inconsistent decimal places in UnitedHealth Group premiums', Severity: 'Medium', Status: 'Open' },
+                { RowNumber: 37, FieldName: 'Employees', ErrorType: 'Format Error', Description: 'Range format in Anthem Inc. employee count', Severity: 'Low', Status: 'In Progress' },
+                { RowNumber: 40, FieldName: 'Founded', ErrorType: 'Format Error', Description: 'MM/DD/YYYY format in Aetna founding date', Severity: 'Medium', Status: 'Open' },
+                { RowNumber: 43, FieldName: 'AUM', ErrorType: 'Format Error', Description: 'Abbreviation format in Cigna Corporation AUM', Severity: 'Low', Status: 'Resolved' },
+                { RowNumber: 46, FieldName: 'Revenue', ErrorType: 'Format Error', Description: 'Negative sign placement in Humana Inc. revenue', Severity: 'Medium', Status: 'Open' },
+                { RowNumber: 48, FieldName: 'Rating', ErrorType: 'Format Error', Description: 'Non-standard symbols in MetLife Inc. rating', Severity: 'Low', Status: 'In Progress' },
+                { RowNumber: 51, FieldName: 'Location', ErrorType: 'Format Error', Description: 'Full address format in Prudential Financial location', Severity: 'Medium', Status: 'Open' },
+                { RowNumber: 54, FieldName: 'CEO', ErrorType: 'Format Error', Description: 'Title included in New York Life CEO field', Severity: 'Low', Status: 'Resolved' }
+            ],
+            'Duplicate Records': [
+                { RowNumber: '15, 47', FieldName: 'BankName', ErrorType: 'Duplicate', Description: 'Duplicate entry found: JPMorgan Chase & Co.', Severity: 'High', Status: 'Open' },
+                { RowNumber: '23, 89', FieldName: 'FirmName', ErrorType: 'Duplicate', Description: 'Duplicate entry found: BlackRock', Severity: 'High', Status: 'In Progress' },
+                { RowNumber: '31, 67', FieldName: 'CompanyName', ErrorType: 'Duplicate', Description: 'Duplicate entry found: Berkshire Hathaway', Severity: 'High', Status: 'Open' },
+                { RowNumber: '42, 78', FieldName: 'UnionName', ErrorType: 'Duplicate', Description: 'Duplicate entry found: Navy Federal Credit Union', Severity: 'High', Status: 'In Progress' },
+                { RowNumber: '56, 92', FieldName: 'BankName', ErrorType: 'Duplicate', Description: 'Duplicate entry found: Wells Fargo', Severity: 'High', Status: 'Open' },
+                { RowNumber: '64, 103', FieldName: 'ExchangeName', ErrorType: 'Duplicate', Description: 'Duplicate entry found: Coinbase Pro', Severity: 'High', Status: 'Resolved' },
+                { RowNumber: '71, 98', FieldName: 'FundName', ErrorType: 'Duplicate', Description: 'Duplicate entry found: Vanguard 500 Index Fund', Severity: 'High', Status: 'Open' },
+                { RowNumber: '85, 116', FieldName: 'LenderName', ErrorType: 'Duplicate', Description: 'Duplicate entry found: Quicken Loans (Rocket Mortgage)', Severity: 'High', Status: 'In Progress' }
+            ]
+        };
+
+        // Generate additional realistic data
+        generateRealisticData();
+
+        // Initialize with sample data
+        filesData = sampleData;
+        updateFileList();
+        
+        // Initialize error summary
+        displayWorksheetData(currentWorksheet);
+
+        // Add event listener for global search box
+        document.getElementById('globalSearchBox').addEventListener('input', function(e) {
+            currentSearchTerm = e.target.value.toLowerCase().trim();
+            
+            // Check which tab is active and update accordingly
+            const activeTab = document.querySelector('.tab.active').textContent;
+            
+            if (activeTab === 'Financial Search') {
+                // Update file list and current file display
+                updateFileList();
+                if (selectedFile) {
+                    displayFileData(selectedFile);
+                }
+            } else if (activeTab === 'Error Summary') {
+                // Search in error data
+                searchInErrorData(currentSearchTerm);
+            }
+        });
+
+        function searchInErrorData(searchTerm) {
+            const data = errorSummaryData[currentWorksheet];
+            const container = document.getElementById('errorDataContainer');
+            
+            if (!data || data.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📋</div>
+                        <h3>No data available</h3>
+                        <p>No ${currentWorksheet.toLowerCase()} found</p>
+                    </div>
+                `;
+                return;
+            }
+
+            let filteredData = data;
+            if (searchTerm) {
+                filteredData = data.filter(row => {
+                    return Object.values(row).some(value => 
+                        String(value).toLowerCase().includes(searchTerm)
+                    );
+                });
+            }
+
+            if (filteredData.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">🔍</div>
+                        <h3>No matching records</h3>
+                        <p>No records in "${currentWorksheet}" match "${searchTerm}"</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const headers = Object.keys(filteredData[0]);
+            let tableHTML = `
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            ${headers.map(header => `<th>${header}</th>`).join('')}
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            filteredData.forEach(row => {
+                const isHighlighted = searchTerm && Object.values(row).some(value => 
+                    String(value).toLowerCase().includes(searchTerm)
+                );
+                
+                tableHTML += `<tr${isHighlighted ? ' class="highlight"' : ''}>`;
+                headers.forEach(header => {
+                    let cellValue = row[header];
+                    let cellClass = '';
+                    
+                    // Color coding based on severity or status
+                    if (header === 'Severity') {
+                        if (cellValue === 'High') cellClass = 'style="color: #dc3545; font-weight: 600;"';
+                        else if (cellValue === 'Medium') cellClass = 'style="color: #fd7e14; font-weight: 600;"';
+                        else if (cellValue === 'Low') cellClass = 'style="color: #28a745; font-weight: 600;"';
+                    } else if (header === 'Status') {
+                        if (cellValue === 'Open') cellClass = 'style="color: #dc3545;"';
+                        else if (cellValue === 'In Progress') cellClass = 'style="color: #ffc107;"';
+                        else if (cellValue === 'Resolved') cellClass = 'style="color: #28a745;"';
+                    }
+                    
+                    // Highlight search terms
+                    if (searchTerm && String(cellValue).toLowerCase().includes(searchTerm)) {
+                        const regex = new RegExp(`(${searchTerm})`, 'gi');
+                        cellValue = String(cellValue).replace(regex, '<strong style="background-color: yellow;">$1</strong>');
+                    }
+                    
+                    tableHTML += `<td ${cellClass}>${cellValue}</td>`;
+                });
+                tableHTML += '</tr>';
+            });
+
+            tableHTML += '</tbody></table>';
+            container.innerHTML = tableHTML;
+        }
+
+        function switchTab(tabName) {
+            // Update tab buttons
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // Update tab content
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            
+            if (tabName === 'search') {
+                document.getElementById('searchTab').classList.add('active');
+                // Refresh search results if there's a search term
+                if (currentSearchTerm) {
+                    updateFileList();
+                    if (selectedFile) {
+                        displayFileData(selectedFile);
+                    }
+                }
+            } else if (tabName === 'errors') {
+                document.getElementById('errorsTab').classList.add('active');
+                // Apply current search if there is one
+                if (currentSearchTerm) {
+                    searchInErrorData(currentSearchTerm);
+                } else {
+                    displayWorksheetData(currentWorksheet);
+                }
+            } else if (tabName === 'comparator') {
+                document.getElementById('comparatorTab').classList.add('active');
+                // Initialize comparator dropdowns when tab is first opened
+                updateComparisonFileSelects();
+            }
+        }
+
+        function switchWorksheet(worksheetName) {
+            // Update worksheet tab buttons
+            document.querySelectorAll('.worksheet-tab').forEach(tab => tab.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            currentWorksheet = worksheetName;
+            
+            // Apply current search if there is one
+            if (currentSearchTerm) {
+                searchInErrorData(currentSearchTerm);
+            } else {
+                displayWorksheetData(worksheetName);
+            }
+        }
+
+        function displayWorksheetData(worksheetName) {
+            const data = errorSummaryData[worksheetName];
+            const container = document.getElementById('errorDataContainer');
+            
+            if (!data || data.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📋</div>
+                        <h3>No data available</h3>
+                        <p>No ${worksheetName.toLowerCase()} found</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const headers = Object.keys(data[0]);
+            let tableHTML = `
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            ${headers.map(header => `<th>${header}</th>`).join('')}
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            data.forEach(row => {
+                tableHTML += '<tr>';
+                headers.forEach(header => {
+                    let cellValue = row[header];
+                    let cellClass = '';
+                    
+                    // Color coding based on severity or status
+                    if (header === 'Severity') {
+                        if (cellValue === 'High') cellClass = 'style="color: #dc3545; font-weight: 600;"';
+                        else if (cellValue === 'Medium') cellClass = 'style="color: #fd7e14; font-weight: 600;"';
+                        else if (cellValue === 'Low') cellClass = 'style="color: #28a745; font-weight: 600;"';
+                    } else if (header === 'Status') {
+                        if (cellValue === 'Open') cellClass = 'style="color: #dc3545;"';
+                        else if (cellValue === 'In Progress') cellClass = 'style="color: #ffc107;"';
+                        else if (cellValue === 'Resolved') cellClass = 'style="color: #28a745;"';
+                    }
+                    
+                    tableHTML += `<td ${cellClass}>${cellValue}</td>`;
+                });
+                tableHTML += '</tr>';
+            });
+
+            tableHTML += '</tbody></table>';
+            container.innerHTML = tableHTML;
+        }
+
+        function updateFileList() {
+            const fileList = document.getElementById('fileList');
+            fileList.innerHTML = '';
+
+            Object.keys(filesData).forEach(fileName => {
+                const data = filesData[fileName];
+                const matchCount = getMatchCount(data, currentSearchTerm);
+                
+                const fileItem = document.createElement('div');
+                fileItem.className = 'file-item';
+                
+                if (currentSearchTerm && matchCount === 0) {
+                    fileItem.classList.add('hidden');
+                } else {
+                    fileItem.classList.remove('hidden');
+                }
+
+                if (selectedFile === fileName) {
+                    fileItem.classList.add('active');
+                }
+
+                fileItem.innerHTML = `
+                    <div class="file-name">
+                        ${fileName}
+                        ${matchCount > 0 && currentSearchTerm ? `<span class="match-count">${matchCount} matches</span>` : ''}
+                    </div>
+                    <div class="file-info">${data.length} records</div>
+                `;
+
+                fileItem.addEventListener('click', () => {
+                    document.querySelectorAll('.file-item').forEach(item => item.classList.remove('active'));
+                    fileItem.classList.add('active');
+                    selectedFile = fileName;
+                    displayFileData(fileName);
+                });
+
+                fileList.appendChild(fileItem);
+            });
+
+            // Show "no results" message if all files are hidden
+            if (currentSearchTerm && document.querySelectorAll('.file-item:not(.hidden)').length === 0) {
+                const noResults = document.createElement('div');
+                noResults.className = 'no-results';
+                noResults.textContent = `No files contain "${currentSearchTerm}"`;
+                fileList.appendChild(noResults);
+            }
+        }
+
+        function getMatchCount(data, searchTerm) {
+            if (!searchTerm) return 0;
+            
+            return data.filter(row => {
+                return Object.values(row).some(value => 
+                    String(value).toLowerCase().includes(searchTerm)
+                );
+            }).length;
+        }
+
+        function displayFileData(fileName) {
+            const data = filesData[fileName];
+            const contentTitle = document.getElementById('contentTitle');
+            const contentSubtitle = document.getElementById('contentSubtitle');
+            const dataContainer = document.getElementById('dataContainer');
+
+            contentTitle.textContent = fileName;
+            
+            let filteredData = data;
+            if (currentSearchTerm) {
+                filteredData = data.filter(row => {
+                    return Object.values(row).some(value => 
+                        String(value).toLowerCase().includes(currentSearchTerm)
+                    );
+                });
+                contentSubtitle.textContent = `Showing ${filteredData.length} of ${data.length} records matching "${currentSearchTerm}"`;
+            } else {
+                contentSubtitle.textContent = `${data.length} total records`;
+            }
+
+            if (filteredData.length === 0) {
+                dataContainer.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">🔍</div>
+                        <h3>No matching records</h3>
+                        <p>No records in this file match "${currentSearchTerm}"</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const headers = Object.keys(filteredData[0]);
+            let tableHTML = `
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            ${headers.map(header => `<th>${header}</th>`).join('')}
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            filteredData.forEach(row => {
+                const isHighlighted = currentSearchTerm && Object.values(row).some(value => 
+                    String(value).toLowerCase().includes(currentSearchTerm)
+                );
+                
+                tableHTML += `<tr${isHighlighted ? ' class="highlight"' : ''}>`;
+                headers.forEach(header => {
+                    let cellValue = row[header];
+                    if (currentSearchTerm && String(cellValue).toLowerCase().includes(currentSearchTerm)) {
+                        const regex = new RegExp(`(${currentSearchTerm})`, 'gi');
+                        cellValue = String(cellValue).replace(regex, '<strong style="background-color: yellow;">$1</strong>');
+                    }
+                    tableHTML += `<td>${cellValue}</td>`;
+                });
+                tableHTML += '</tr>';
+            });
+
+            tableHTML += '</tbody></table>';
+            dataContainer.innerHTML = tableHTML;
+        }
+
+        function handleFileUpload(event) {
+            const files = event.target.files;
+            
+            Array.from(files).forEach(file => {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    try {
+                        const data = new Uint8Array(e.target.result);
+                        const workbook = XLSX.read(data, { type: 'array' });
+                        const firstSheetName = workbook.SheetNames[0];
+                        const worksheet = workbook.Sheets[firstSheetName];
+                        const jsonData = XLSX.utils.sheet_to_json(worksheet);
+                        
+                        if (jsonData.length > 0) {
+                            filesData[file.name] = jsonData;
+                            updateFileList();
+                        }
+                    } catch (error) {
+                        alert(`Error reading file ${file.name}: ${error.message}`);
+                    }
+                };
+                reader.readAsArrayBuffer(file);
+            });
+        }
+
+        // Comparator Tool Functions
+        function updateComparisonFileSelects() {
+            const fileASelect = document.getElementById('fileASelect');
+            const fileBSelect = document.getElementById('fileBSelect');
+            
+            if (!fileASelect || !fileBSelect) return;
+            
+            // Clear existing options (except the first "Select file..." option)
+            fileASelect.innerHTML = '<option value="">Select file...</option>';
+            fileBSelect.innerHTML = '<option value="">Select file...</option>';
+            
+            // Add all available files
+            Object.keys(filesData).forEach(fileName => {
+                const optionA = document.createElement('option');
+                optionA.value = fileName;
+                optionA.textContent = fileName;
+                fileASelect.appendChild(optionA);
+                
+                const optionB = document.createElement('option');
+                optionB.value = fileName;
+                optionB.textContent = fileName;
+                fileBSelect.appendChild(optionB);
+            });
+        }
+
+        function selectComparisonFile(fileType, fileName) {
+            comparisonFiles[fileType] = fileName;
+            updateCompareButtonState();
+        }
+
+        function updateCompareButtonState() {
+            const compareBtn = document.getElementById('compareBtn');
+            if (!compareBtn) return;
+            
+            const hasValidSelection = comparisonFiles.A && comparisonFiles.B && comparisonFiles.A !== comparisonFiles.B;
+            
+            compareBtn.disabled = !hasValidSelection;
+            
+            if (hasValidSelection) {
+                compareBtn.style.background = '#28a745';
+                compareBtn.style.cursor = 'pointer';
+            } else {
+                compareBtn.style.background = '#6c757d';
+                compareBtn.style.cursor = 'not-allowed';
+            }
+        }
+
+        function performComparison() {
+            if (!comparisonFiles.A || !comparisonFiles.B || comparisonFiles.A === comparisonFiles.B) {
+                alert('Please select two different files to compare.');
+                return;
+            }
+            
+            // Update the comparison title
+            const titleElement = document.getElementById('comparatorTitle');
+            const subtitleElement = document.getElementById('comparatorSubtitle');
+            
+            if (titleElement) titleElement.textContent = 'File Comparison Results';
+            if (subtitleElement) subtitleElement.textContent = `${comparisonFiles.A} vs ${comparisonFiles.B}`;
+            
+            // Simulate comparison process (in real implementation, this would perform actual comparison)
+            setTimeout(() => {
+                // Show a success message or update UI to indicate comparison is complete
+                alert(`Comparison completed between ${comparisonFiles.A} and ${comparisonFiles.B}!`);
+            }, 500);
+        }
+
+        function switchComparisonView(viewType) {
+            // Update tab buttons
+            document.querySelectorAll('.comparison-tab').forEach(tab => tab.classList.remove('active'));
+            if (event && event.target) {
+                event.target.classList.add('active');
+            }
+            
+            // Update view content
+            document.querySelectorAll('.comparison-view').forEach(view => view.classList.remove('active'));
+            
+            currentComparisonView = viewType;
+            
+            if (viewType === 'side-by-side') {
+                const element = document.getElementById('sideBySideView');
+                if (element) element.classList.add('active');
+            } else if (viewType === 'unified') {
+                const element = document.getElementById('unifiedView');
+                if (element) element.classList.add('active');
+            } else if (viewType === 'summary') {
+                const element = document.getElementById('summaryView');
+                if (element) element.classList.add('active');
+            }
+        }
+
+        // Initialize comparator when DOM is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            // Small delay to ensure all elements are rendered
+            setTimeout(() => {
+                updateComparisonFileSelects();
+                updateCompareButtonState();
+            }, 100);
+        });
+    </script>
+</body>
+</html> '
