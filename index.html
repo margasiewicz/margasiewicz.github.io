@@ -690,11 +690,15 @@
             <div class="content-wrapper">
                 <div class="sidebar">
                     <div class="file-list" id="fileList">
-                        <!-- Files will be populated here -->
+                        <div class="empty-state">
+                            <div class="empty-state-icon">📁</div>
+                            <h3>No files uploaded</h3>
+                            <p>Click the button below to upload Excel files</p>
+                        </div>
                     </div>
                     <div class="upload-section">
                         <button class="upload-btn" onclick="document.getElementById('fileInput').click()">
-                            📁 Upload Excel Files
+                            📂 Upload Excel Files
                         </button>
                         <input type="file" id="fileInput" class="file-input" multiple accept=".xlsx,.xls" onchange="handleFileUpload(event)">
                     </div>
@@ -731,7 +735,11 @@
                 </div>
                 
                 <div class="data-table-container" id="errorDataContainer">
-                    <!-- Error data will be populated here -->
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📋</div>
+                        <h3>No error data available</h3>
+                        <p>Upload files to see validation errors</p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -797,19 +805,19 @@
                         <div class="comparison-stats">
                             <div class="stat-item">
                                 <span class="stat-label">Total Changes:</span>
-                                <span class="stat-value" id="totalChanges">247</span>
+                                <span class="stat-value" id="totalChanges">0</span>
                             </div>
                             <div class="stat-item">
                                 <span class="stat-label">Modified:</span>
-                                <span class="stat-value modified" id="modifiedCount">189</span>
+                                <span class="stat-value modified" id="modifiedCount">0</span>
                             </div>
                             <div class="stat-item">
                                 <span class="stat-label">Added:</span>
-                                <span class="stat-value added" id="addedCount">34</span>
+                                <span class="stat-value added" id="addedCount">0</span>
                             </div>
                             <div class="stat-item">
                                 <span class="stat-label">Removed:</span>
-                                <span class="stat-value removed" id="removedCount">24</span>
+                                <span class="stat-value removed" id="removedCount">0</span>
                             </div>
                         </div>
                     </div>
@@ -818,7 +826,7 @@
                 <div class="main-content">
                     <div class="content-header">
                         <div class="content-title" id="comparatorTitle">File Comparison Results</div>
-                        <div class="content-subtitle" id="comparatorSubtitle">major_banks_portfolio_2024.xlsx vs major_banks_portfolio_2024_updated.xlsx</div>
+                        <div class="content-subtitle" id="comparatorSubtitle">Select two files to compare</div>
                     </div>
                     
                     <div class="comparison-tabs">
@@ -829,175 +837,26 @@
                     
                     <div class="data-table-container" id="comparisonContainer">
                         <div id="sideBySideView" class="comparison-view active">
-                            <table class="comparison-table">
-                                <thead>
-                                    <tr>
-                                        <th rowspan="2" style="border-right: 2px solid #4a90e2;">Field</th>
-                                        <th colspan="2" style="text-align: center; background: #e8f4fd;">File A (Base)</th>
-                                        <th colspan="2" style="text-align: center; background: #fff2e8;">File B (Compare)</th>
-                                        <th rowspan="2">Status</th>
-                                    </tr>
-                                    <tr>
-                                        <th style="background: #e8f4fd;">JPMorgan Chase</th>
-                                        <th style="background: #e8f4fd;">Bank of America</th>
-                                        <th style="background: #fff2e8;">JPMorgan Chase</th>
-                                        <th style="background: #fff2e8;">Bank of America</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td style="font-weight: 600; border-right: 2px solid #4a90e2;">BankName</td>
-                                        <td>JPMorgan Chase & Co.</td>
-                                        <td>Bank of America</td>
-                                        <td>JPMorgan Chase & Co.</td>
-                                        <td>Bank of America Corp</td>
-                                        <td><span class="status-badge modified">Modified</span></td>
-                                    </tr>
-                                    <tr>
-                                        <td style="font-weight: 600; border-right: 2px solid #4a90e2;">Assets</td>
-                                        <td>3,743,567,000,000</td>
-                                        <td>3,169,495,000,000</td>
-                                        <td style="background: #ffe6e6;">3,875,392,000,000</td>
-                                        <td style="background: #ffe6e6;">3,298,654,000,000</td>
-                                        <td><span class="status-badge modified">Modified</span></td>
-                                    </tr>
-                                    <tr>
-                                        <td style="font-weight: 600; border-right: 2px solid #4a90e2;">Location</td>
-                                        <td>New York, NY</td>
-                                        <td>Charlotte, NC</td>
-                                        <td>New York, NY</td>
-                                        <td>Charlotte, NC</td>
-                                        <td><span class="status-badge unchanged">Unchanged</span></td>
-                                    </tr>
-                                    <tr>
-                                        <td style="font-weight: 600; border-right: 2px solid #4a90e2;">Rating</td>
-                                        <td>A+</td>
-                                        <td>A</td>
-                                        <td style="background: #ffe6e6;">AA-</td>
-                                        <td>A</td>
-                                        <td><span class="status-badge modified">Modified</span></td>
-                                    </tr>
-                                    <tr>
-                                        <td style="font-weight: 600; border-right: 2px solid #4a90e2;">Employees</td>
-                                        <td>293,723</td>
-                                        <td>216,823</td>
-                                        <td style="background: #ffe6e6;">295,891</td>
-                                        <td style="background: #ffe6e6;">218,456</td>
-                                        <td><span class="status-badge modified">Modified</span></td>
-                                    </tr>
-                                    <tr style="background: #e8f5e8;">
-                                        <td style="font-weight: 600; border-right: 2px solid #4a90e2;">CEO</td>
-                                        <td>-</td>
-                                        <td>-</td>
-                                        <td>Jamie Dimon</td>
-                                        <td>Brian Moynihan</td>
-                                        <td><span class="status-badge added">Added</span></td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                            <div class="empty-state">
+                                <div class="empty-state-icon">🔍</div>
+                                <h3>No comparison yet</h3>
+                                <p>Select two files from the sidebar and click "Compare Files"</p>
+                            </div>
                         </div>
                         
                         <div id="unifiedView" class="comparison-view">
-                            <div class="unified-comparison">
-                                <div class="diff-section">
-                                    <h4>🔄 Modified Records (189)</h4>
-                                    <div class="diff-item">
-                                        <div class="diff-header">Record: JPMorgan Chase & Co. (Row 1)</div>
-                                        <div class="diff-changes">
-                                            <div class="change-item">
-                                                <span class="field-name">Assets:</span>
-                                                <span class="old-value">3,743,567,000,000</span>
-                                                <span class="arrow">→</span>
-                                                <span class="new-value">3,875,392,000,000</span>
-                                            </div>
-                                            <div class="change-item">
-                                                <span class="field-name">Employees:</span>
-                                                <span class="old-value">293,723</span>
-                                                <span class="arrow">→</span>
-                                                <span class="new-value">295,891</span>
-                                            </div>
-                                            <div class="change-item">
-                                                <span class="field-name">Rating:</span>
-                                                <span class="old-value">A+</span>
-                                                <span class="arrow">→</span>
-                                                <span class="new-value">AA-</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <div class="diff-section">
-                                    <h4>➕ Added Records (34)</h4>
-                                    <div class="diff-item added">
-                                        <div class="diff-header">New Record: First Republic Bank</div>
-                                        <div class="record-details">
-                                            Assets: $212,000,000,000 | Location: San Francisco, CA | Rating: A+ | Employees: 7,200
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <div class="diff-section">
-                                    <h4>➖ Removed Records (24)</h4>
-                                    <div class="diff-item removed">
-                                        <div class="diff-header">Deleted Record: Silicon Valley Bank</div>
-                                        <div class="record-details">
-                                            Assets: $209,000,000,000 | Location: Santa Clara, CA | Rating: BBB+ | Employees: 8,500
-                                        </div>
-                                    </div>
-                                </div>
+                            <div class="empty-state">
+                                <div class="empty-state-icon">🔍</div>
+                                <h3>No comparison yet</h3>
+                                <p>Select two files from the sidebar and click "Compare Files"</p>
                             </div>
                         </div>
                         
                         <div id="summaryView" class="comparison-view">
-                            <div class="summary-report">
-                                <div class="summary-section">
-                                    <h3>📊 Comparison Summary</h3>
-                                    <div class="summary-grid">
-                                        <div class="summary-card">
-                                            <div class="summary-number">247</div>
-                                            <div class="summary-label">Total Changes</div>
-                                        </div>
-                                        <div class="summary-card">
-                                            <div class="summary-number">76.5%</div>
-                                            <div class="summary-label">Modified</div>
-                                        </div>
-                                        <div class="summary-card">
-                                            <div class="summary-number">13.8%</div>
-                                            <div class="summary-label">Added</div>
-                                        </div>
-                                        <div class="summary-card">
-                                            <div class="summary-number">9.7%</div>
-                                            <div class="summary-label">Removed</div>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <div class="summary-section">
-                                    <h4>📈 Most Changed Fields</h4>
-                                    <div class="field-changes">
-                                        <div class="field-change-item">
-                                            <span class="field-name">Assets</span>
-                                            <div class="change-bar">
-                                                <div class="change-fill" style="width: 89%;"></div>
-                                            </div>
-                                            <span class="change-count">156 changes</span>
-                                        </div>
-                                        <div class="field-change-item">
-                                            <span class="field-name">Employees</span>
-                                            <div class="change-bar">
-                                                <div class="change-fill" style="width: 67%;"></div>
-                                            </div>
-                                            <span class="change-count">117 changes</span>
-                                        </div>
-                                        <div class="field-change-item">
-                                            <span class="field-name">Rating</span>
-                                            <div class="change-bar">
-                                                <div class="change-fill" style="width: 34%;"></div>
-                                            </div>
-                                            <span class="change-count">59 changes</span>
-                                        </div>
-                                    </div>
-                                </div>
+                            <div class="empty-state">
+                                <div class="empty-state-icon">🔍</div>
+                                <h3>No comparison yet</h3>
+                                <p>Select two files from the sidebar and click "Compare Files"</p>
                             </div>
                         </div>
                     </div>
@@ -1013,475 +872,56 @@
         let currentWorksheet = 'Data Validation Errors';
         let comparisonFiles = { A: null, B: null };
         let currentComparisonView = 'side-by-side';
-
-        // Realistic financial data with real bank names and institutions
-        const sampleData = {
-            'major_us_banks_2024.xlsx': [
-                { BankName: 'JPMorgan Chase & Co.', Assets: 3743567000000, Location: 'New York, NY', Rating: 'A+', Employees: 293723, Founded: 1799, CEO: 'Jamie Dimon' },
-                { BankName: 'Bank of America', Assets: 3169495000000, Location: 'Charlotte, NC', Rating: 'A', Employees: 216823, Founded: 1904, CEO: 'Brian Moynihan' },
-                { BankName: 'Wells Fargo', Assets: 1886267000000, Location: 'San Francisco, CA', Rating: 'A-', Employees: 238698, Founded: 1852, CEO: 'Charles Scharf' },
-                { BankName: 'Citigroup', Assets: 2416676000000, Location: 'New York, NY', Rating: 'A', Employees: 238104, Founded: 1812, CEO: 'Jane Fraser' },
-                { BankName: 'U.S. Bancorp', Assets: 590776000000, Location: 'Minneapolis, MN', Rating: 'AA-', Employees: 74000, Founded: 1863, CEO: 'Andy Cecere' },
-                { BankName: 'PNC Financial Services', Assets: 560109000000, Location: 'Pittsburgh, PA', Rating: 'A+', Employees: 52518, Founded: 1845, CEO: 'William Demchak' },
-                { BankName: 'Goldman Sachs', Assets: 1616318000000, Location: 'New York, NY', Rating: 'A', Employees: 49100, Founded: 1869, CEO: 'David Solomon' },
-                { BankName: 'Morgan Stanley', Assets: 1199199000000, Location: 'New York, NY', Rating: 'A+', Employees: 75000, Founded: 1935, CEO: 'James Gorman' }
-            ],
-            'investment_firms_2024.xlsx': [
-                { FirmName: 'BlackRock', AUM: 10009000000000, Location: 'New York, NY', Type: 'Asset Management', Founded: 1988, CEO: 'Larry Fink' },
-                { FirmName: 'Vanguard Group', AUM: 8100000000000, Location: 'Malvern, PA', Type: 'Asset Management', Founded: 1975, CEO: 'Tim Buckley' },
-                { FirmName: 'State Street Global', AUM: 4140000000000, Location: 'Boston, MA', Type: 'Custody Bank', Founded: 1792, CEO: 'Ronald O\'Hanley' },
-                { FirmName: 'Fidelity Investments', AUM: 4500000000000, Location: 'Boston, MA', Type: 'Asset Management', Founded: 1946, CEO: 'Abigail Johnson' },
-                { FirmName: 'BNY Mellon', AUM: 2400000000000, Location: 'New York, NY', Type: 'Custody Bank', Founded: 1784, CEO: 'Robin Vince' },
-                { FirmName: 'Charles Schwab', AUM: 8140000000000, Location: 'Westlake, TX', Type: 'Brokerage', Founded: 1971, CEO: 'Walt Bettinger' }
-            ],
-            'credit_unions_2024.xlsx': [
-                { UnionName: 'Navy Federal Credit Union', Members: 13000000, Location: 'Vienna, VA', Assets: 165000000000, Type: 'Federal', Founded: 1933 },
-                { UnionName: 'State Employees Credit Union', Members: 2600000, Location: 'Raleigh, NC', Assets: 50000000000, Type: 'State', Founded: 1937 },
-                { UnionName: 'Pentagon Federal Credit Union', Members: 2400000, Location: 'McLean, VA', Assets: 34000000000, Type: 'Federal', Founded: 1935 },
-                { UnionName: 'Boeing Employees Credit Union', Members: 1300000, Location: 'Tukwila, WA', Assets: 25000000000, Type: 'Corporate', Founded: 1935 },
-                { UnionName: 'SchoolsFirst Federal Credit Union', Members: 1200000, Location: 'Santa Ana, CA', Assets: 26000000000, Type: 'Educational', Founded: 1934 }
-            ],
-            'international_banks_2024.xlsx': [
-                { BankName: 'HSBC Holdings', Country: 'United Kingdom', Assets: 2958000000000, Branches: 3800, Established: 1865, CEO: 'Noel Quinn' },
-                { BankName: 'BNP Paribas', Country: 'France', Assets: 2844000000000, Branches: 2200, Established: 1848, CEO: 'Jean-Laurent Bonnafé' },
-                { BankName: 'Deutsche Bank', Country: 'Germany', Assets: 1324000000000, Branches: 1800, Established: 1870, CEO: 'Christian Sewing' },
-                { BankName: 'Barclays', Country: 'United Kingdom', Assets: 1631000000000, Branches: 1600, Established: 1690, CEO: 'C.S. Venkatakrishnan' },
-                { BankName: 'UBS Group', Country: 'Switzerland', Assets: 1118000000000, Branches: 4150, Established: 1862, CEO: 'Ralph Hamers' },
-                { BankName: 'Royal Bank of Canada', Country: 'Canada', Assets: 1540000000000, Branches: 1300, Established: 1869, CEO: 'Dave McKay' }
-            ],
-            'comprehensive_bank_data_2024.xlsx': [
-                { 
-                    BankName: 'JPMorgan Chase & Co.', 
-                    Assets: 3743567000000, 
-                    Liabilities: 3402891000000, 
-                    Equity: 340676000000, 
-                    Revenue: 162348000000,
-                    NetIncome: 49552000000,
-                    ROA: 1.32,
-                    ROE: 14.5,
-                    Employees: 293723,
-                    Branches: 4900,
-                    ATMs: 16000,
-                    Location: 'New York, NY',
-                    Country: 'USA',
-                    Established: 1799,
-                    CEO: 'Jamie Dimon',
-                    Rating_SP: 'A+',
-                    Rating_Moody: 'Aa2',
-                    Rating_Fitch: 'A+',
-                    Deposits: 2954919000000,
-                    Loans: 1186078000000,
-                    NPL_Ratio: 0.26,
-                    CapitalRatio: 15.0,
-                    LiquidityRatio: 24.2,
-                    CostIncomeRatio: 57.8,
-                    NetInterestMargin: 2.28,
-                    BookValue: 115.50,
-                    MarketCap: 478900000000,
-                    PriceToBook: 1.41,
-                    DividendYield: 2.45,
-                    BetaCoeff: 1.15
-                },
-                { 
-                    BankName: 'Bank of America', 
-                    Assets: 3169495000000, 
-                    Liabilities: 2885629000000, 
-                    Equity: 283866000000, 
-                    Revenue: 90208000000,
-                    NetIncome: 31978000000,
-                    ROA: 1.01,
-                    ROE: 11.3,
-                    Employees: 216823,
-                    Branches: 3900,
-                    ATMs: 16000,
-                    Location: 'Charlotte, NC',
-                    Country: 'USA',
-                    Established: 1904,
-                    CEO: 'Brian Moynihan',
-                    Rating_SP: 'A',
-                    Rating_Moody: 'A1',
-                    Rating_Fitch: 'A',
-                    Deposits: 1947317000000,
-                    Loans: 1062000000000,
-                    NPL_Ratio: 0.37,
-                    CapitalRatio: 13.8,
-                    LiquidityRatio: 21.4,
-                    CostIncomeRatio: 66.2,
-                    NetInterestMargin: 1.97,
-                    BookValue: 33.12,
-                    MarketCap: 268400000000,
-                    PriceToBook: 0.95,
-                    DividendYield: 2.38,
-                    BetaCoeff: 1.25
-                }
-            ]
-        };
-
-        // Generate additional realistic data
-        const generateRealisticData = () => {
-            const realBankNames = [
-                'Truist Financial', 'TD Bank', 'Capital One', 'Fifth Third Bank', 'KeyBank', 'Regions Bank',
-                'Huntington National Bank', 'M&T Bank', 'Zions Bancorp', 'First Citizens Bank',
-                'Comerica Bank', 'Western Alliance Bank', 'Popular Inc', 'Synovus Financial',
-                'First Horizon Bank', 'Associated Banc-Corp', 'East West Bank', 'First Republic Bank',
-                'SVB Financial Group', 'Signature Bank', 'New York Community Bank', 'Webster Financial',
-                'United Community Banks', 'Independent Bank Group', 'Texas Capital Bancshares'
-            ];
-
-            const locations = [
-                'Charlotte, NC', 'New York, NY', 'San Francisco, CA', 'Chicago, IL', 'Boston, MA',
-                'Miami, FL', 'Atlanta, GA', 'Dallas, TX', 'Philadelphia, PA', 'Denver, CO',
-                'Seattle, WA', 'Phoenix, AZ', 'Detroit, MI', 'Minneapolis, MN', 'Cleveland, OH'
-            ];
-
-            const ratings = ['AAA', 'AA+', 'AA', 'AA-', 'A+', 'A', 'A-', 'BBB+', 'BBB', 'BBB-'];
-            
-            sampleData['regional_banks_analysis_2024.xlsx'] = realBankNames.map((name, i) => ({
-                BankName: name,
-                Assets: Math.floor(Math.random() * 200000000000) + 50000000000,
-                Location: locations[i % locations.length],
-                Rating: ratings[i % ratings.length],
-                Employees: Math.floor(Math.random() * 25000) + 5000,
-                Founded: Math.floor(Math.random() * 50) + 1970,
-                CEO: `CEO of ${name.split(' ')[0]}`,
-                Branches: Math.floor(Math.random() * 500) + 100
-            }));
-
-            const europeNames = [
-                'Crédit Agricole', 'Banco Santander', 'ING Group', 'Société Générale', 'UniCredit',
-                'Intesa Sanpaolo', 'Standard Chartered', 'Lloyds Banking Group', 'NatWest Group',
-                'Nordea Bank', 'Danske Bank', 'ABN AMRO', 'KBC Group', 'Commerzbank',
-                'Rabobank', 'CaixaBank', 'BBVA', 'Credit Suisse', 'Erste Group', 'AIB Group',
-                'Bank of Ireland', 'Swedbank'
-            ];
-
-            const europeanCountries = [
-                'France', 'Spain', 'Netherlands', 'Italy', 'United Kingdom', 'Germany',
-                'Belgium', 'Sweden', 'Denmark', 'Austria', 'Ireland', 'Switzerland'
-            ];
-
-            sampleData['european_banks_2024.xlsx'] = europeNames.map((name, i) => ({
-                BankName: name,
-                Country: europeanCountries[i % europeanCountries.length],
-                Assets: Math.floor(Math.random() * 2000000000000) + 100000000000,
-                Currency: i % 4 === 3 ? (i % 8 === 3 ? 'CHF' : 'GBP') : 'EUR',
-                Employees: Math.floor(Math.random() * 80000) + 20000,
-                Established: Math.floor(Math.random() * 200) + 1800,
-                CEO: `CEO of ${name.split(' ')[0]}`
-            }));
-
-            const asianNames = [
-                'Industrial and Commercial Bank of China', 'China Construction Bank', 'Agricultural Bank of China',
-                'Bank of China', 'Mitsubishi UFJ Financial Group', 'Sumitomo Mitsui Financial Group',
-                'Mizuho Financial Group', 'China Development Bank', 'Postal Savings Bank of China',
-                'Bank of Communications', 'China Merchants Bank', 'Industrial Bank', 'CITIC Bank',
-                'China Minsheng Bank', 'Ping An Bank', 'China Everbright Bank', 'Hua Xia Bank',
-                'Shanghai Pudong Development Bank', 'Bank of Beijing', 'China Zheshang Bank',
-                'DBS Bank', 'Oversea-Chinese Banking Corp', 'United Overseas Bank', 'CIMB Group',
-                'Malayan Banking', 'Bangkok Bank', 'Kasikornbank', 'Siam Commercial Bank',
-                'Bank Mandiri', 'Bank Central Asia'
-            ];
-
-            const asianCountries = [
-                'China', 'Japan', 'Singapore', 'Malaysia', 'Thailand', 'Indonesia',
-                'South Korea', 'Hong Kong', 'Taiwan', 'Philippines'
-            ];
-
-            sampleData['asian_financial_institutions_2024.xlsx'] = asianNames.map((name, i) => ({
-                InstitutionName: name,
-                Country: asianCountries[i % asianCountries.length],
-                Assets: Math.floor(Math.random() * 4000000000000) + 200000000000,
-                Type: ['Commercial Bank', 'Development Bank', 'Investment Bank'][i % 3],
-                Employees: Math.floor(Math.random() * 150000) + 20000,
-                Founded: Math.floor(Math.random() * 100) + 1920
-            }));
-
-            const creditCardCompanies = [
-                'Visa Inc.', 'Mastercard Inc.', 'American Express', 'Discover Financial Services',
-                'Capital One', 'Chase Card Services', 'Citi Cards', 'Bank of America Cards',
-                'Wells Fargo Cards', 'U.S. Bank Cards', 'Barclays US Consumer Bank',
-                'Synchrony Financial', 'Navy Federal Credit Union Cards', 'USAA Cards',
-                'Pentagon Federal Credit Union Cards', 'Apple Card (Goldman Sachs)',
-                'Amazon Store Card', 'Target RedCard', 'Costco Anywhere Visa',
-                'Home Depot Consumer Credit Card'
-            ];
-
-            sampleData['credit_card_companies_2024.xlsx'] = creditCardCompanies.map((name, i) => ({
-                CompanyName: name,
-                Revenue: Math.floor(Math.random() * 20000000000) + 2000000000,
-                CardholderBase: Math.floor(Math.random() * 100000000) + 10000000,
-                Location: locations[i % locations.length],
-                MarketShare: (Math.random() * 25 + 2).toFixed(2) + '%',
-                Founded: Math.floor(Math.random() * 60) + 1960
-            }));
-
-            const insuranceCompanies = [
-                'Berkshire Hathaway', 'UnitedHealth Group', 'Anthem Inc.', 'Aetna (CVS Health)',
-                'Cigna Corporation', 'Humana Inc.', 'MetLife Inc.', 'Prudential Financial',
-                'New York Life', 'Northwestern Mutual', 'MassMutual', 'TIAA',
-                'Lincoln National', 'Principal Financial Group', 'Aflac Inc.',
-                'Allstate Corporation', 'Progressive Corporation', 'State Farm',
-                'GEICO', 'Liberty Mutual', 'Travelers Companies', 'Hartford Financial',
-                'AIG (American International Group)', 'Chubb Limited', 'Zurich Insurance',
-                'Munich Re', 'Swiss Re', 'Allianz SE'
-            ];
-
-            sampleData['insurance_companies_2024.xlsx'] = insuranceCompanies.map((name, i) => ({
-                CompanyName: name,
-                Assets: Math.floor(Math.random() * 800000000000) + 50000000000,
-                Premiums: Math.floor(Math.random() * 200000000000) + 10000000000,
-                Location: locations[i % locations.length],
-                Type: ['Life', 'Health', 'Property & Casualty', 'Reinsurance'][i % 4],
-                Founded: Math.floor(Math.random() * 150) + 1850,
-                CEO: `CEO of ${name.split(' ')[0]}`
-            }));
-
-            const mutualFunds = [
-                'Vanguard 500 Index Fund', 'Fidelity Contrafund', 'American Funds Growth Fund',
-                'Vanguard Total Stock Market Index', 'American Funds Income Fund',
-                'Fidelity Magellan Fund', 'Vanguard Wellington Fund', 'T. Rowe Price Blue Chip Growth',
-                'American Funds Washington Mutual', 'Dodge & Cox Stock Fund', 'Vanguard Windsor Fund',
-                'Fidelity Puritan Fund', 'American Funds Investment Company', 'PIMCO Total Return Fund',
-                'Vanguard PRIMECAP Fund', 'Fidelity Low-Priced Stock Fund', 'American Funds EuroPacific Growth',
-                'T. Rowe Price Growth Stock Fund', 'Vanguard Energy Fund', 'Fidelity Select Technology',
-                'American Funds Smallcap World Fund', 'Vanguard Health Care Fund',
-                'T. Rowe Price Science & Technology', 'Fidelity Select Biotechnology',
-                'American Funds New Perspective Fund', 'Vanguard Dividend Growth Fund',
-                'T. Rowe Price Equity Income Fund', 'Fidelity Balanced Fund',
-                'American Funds Balanced Fund', 'Vanguard Target Retirement 2050',
-                'T. Rowe Price Retirement 2040', 'Fidelity Freedom 2030 Fund',
-                'American Funds Target Date 2035', 'Vanguard International Growth',
-                'T. Rowe Price International Stock Fund'
-            ];
-
-            sampleData['mutual_funds_2024.xlsx'] = mutualFunds.map((name, i) => ({
-                FundName: name,
-                AUM: Math.floor(Math.random() * 300000000000) + 5000000000,
-                ExpenseRatio: (Math.random() * 1.5 + 0.05).toFixed(3) + '%',
-                YTDReturn: (Math.random() * 30 - 10).toFixed(2) + '%',
-                Category: ['Large Cap Equity', 'Small Cap Equity', 'International Equity', 'Bond Fund', 'Balanced Fund', 'Target Date'][i % 6],
-                Manager: ['Vanguard', 'Fidelity', 'American Funds', 'T. Rowe Price', 'PIMCO', 'Dodge & Cox'][i % 6],
-                Inception: Math.floor(Math.random() * 50) + 1970
-            }));
-
-            const pensionFunds = [
-                'California Public Employees Retirement System', 'California State Teachers Retirement System',
-                'New York State Common Retirement Fund', 'Florida Retirement System',
-                'Teacher Retirement System of Texas', 'New York City Employees Retirement System',
-                'State of Wisconsin Investment Board', 'Washington State Investment Board',
-                'Pennsylvania Public School Employees', 'Ohio Public Employees Retirement System',
-                'Michigan Public School Employees', 'Illinois Teachers Retirement System',
-                'Georgia Teachers Retirement System', 'North Carolina Retirement Systems',
-                'Virginia Retirement System', 'Colorado Public Employees Retirement',
-                'Oregon Public Employees Retirement Fund', 'Minnesota State Retirement System',
-                'Maryland State Retirement System', 'Massachusetts Pension Reserves Investment',
-                'Connecticut Retirement Plans', 'New Jersey Division of Pensions',
-                'Arizona State Retirement System', 'Nevada Public Employees Retirement'
-            ];
-
-            sampleData['pension_funds_2024.xlsx'] = pensionFunds.map((name, i) => ({
-                FundName: name,
-                Assets: Math.floor(Math.random() * 500000000000) + 20000000000,
-                Participants: Math.floor(Math.random() * 2000000) + 100000,
-                State: name.includes('California') ? 'California' : 
-                       name.includes('New York') ? 'New York' : 
-                       name.includes('Florida') ? 'Florida' :
-                       name.includes('Texas') ? 'Texas' : locations[i % locations.length].split(', ')[1],
-                Type: ['Public Employee', 'Teacher', 'State Employee'][i % 3],
-                FundedRatio: (Math.random() * 40 + 60).toFixed(1) + '%',
-                EstablishedYear: Math.floor(Math.random() * 80) + 1940
-            }));
-
-            const hedgeFunds = [
-                'Bridgewater Associates', 'AQR Capital Management', 'Renaissance Technologies',
-                'Man Group', 'Two Sigma Investments', 'Millennium Management',
-                'Citadel LLC', 'Elliott Management', 'DE Shaw & Co', 'Baupost Group',
-                'Third Point LLC', 'Pershing Square Capital', 'Tiger Global Management',
-                'Coatue Management', 'Point72 Asset Management', 'Lone Pine Capital',
-                'Viking Global Investors', 'Paulson & Co', 'Och-Ziff Capital Management',
-                'Farallon Capital Management', 'Canyon Capital Advisors', 'Blackstone Alternative',
-                'Apollo Global Management', 'KKR & Co', 'Carlyle Group', 'Warburg Pincus'
-            ];
-
-            sampleData['hedge_funds_2024.xlsx'] = hedgeFunds.map((name, i) => ({
-                FundName: name,
-                AUM: Math.floor(Math.random() * 150000000000) + 5000000000,
-                Strategy: ['Long/Short Equity', 'Event Driven', 'Global Macro', 'Relative Value', 'Multi-Strategy'][i % 5],
-                Location: ['New York, NY', 'Greenwich, CT', 'London, UK', 'Hong Kong', 'Singapore'][i % 5],
-                Founded: Math.floor(Math.random() * 40) + 1980,
-                MinInvestment: Math.floor(Math.random() * 50000000) + 1000000,
-                ManagementFee: (Math.random() * 1.5 + 1).toFixed(2) + '%'
-            }));
-
-            const fintechCompanies = [
-                'Stripe', 'Square (Block)', 'PayPal', 'Robinhood', 'Coinbase', 'Klarna',
-                'Chime', 'SoFi', 'Affirm', 'Plaid', 'Marqeta', 'Adyen', 'Ant Group',
-                'Revolut', 'Nubank', 'Checkout.com', 'Wise', 'Afterpay', 'Toast',
-                'Brex', 'Mercury', 'Ramp', 'Navan', 'Zip Co', 'Paidy', 'GoCardless',
-                'TrueLayer', 'Zopa', 'Monzo', 'N26', 'Starling Bank', 'Tinkoff Bank'
-            ];
-
-            sampleData['fintech_companies_2024.xlsx'] = fintechCompanies.map((name, i) => ({
-                CompanyName: name,
-                Valuation: Math.floor(Math.random() * 95000000000) + 500000000,
-                LastFunding: Math.floor(Math.random() * 2000000000) + 50000000,
-                Sector: ['Payments', 'Digital Banking', 'Lending', 'Investing', 'Crypto', 'B2B Financial Services'][i % 6],
-                Location: ['San Francisco, CA', 'New York, NY', 'London, UK', 'Berlin, Germany', 'Stockholm, Sweden', 'São Paulo, Brazil'][i % 6],
-                Founded: Math.floor(Math.random() * 20) + 2005,
-                CEO: `CEO of ${name.split(' ')[0]}`
-            }));
-
-            const cryptoExchanges = [
-                'Binance', 'Coinbase Pro', 'FTX', 'Kraken', 'Huobi Global', 'KuCoin',
-                'Gate.io', 'Crypto.com Exchange', 'Bitfinex', 'OKX', 'Bybit', 'Gemini',
-                'Bitstamp', 'Bittrex', 'Poloniex', 'BitMEX', 'Deribit', 'CoinList Pro',
-                'LMAX Digital', 'itBit', 'Liquid'
-            ];
-
-            sampleData['cryptocurrency_exchanges_2024.xlsx'] = cryptoExchanges.map((name, i) => ({
-                ExchangeName: name,
-                DailyVolume: Math.floor(Math.random() * 10000000000) + 100000000,
-                Users: Math.floor(Math.random() * 50000000) + 1000000,
-                Location: ['Malta', 'United States', 'Bahamas', 'United Kingdom', 'Singapore', 'Seychelles'][i % 6],
-                Founded: Math.floor(Math.random() * 15) + 2010,
-                SupportedCoins: Math.floor(Math.random() * 400) + 100,
-                CEO: `CEO of ${name.split(' ')[0]}`
-            }));
-
-            const mortgageLenders = [
-                'Quicken Loans (Rocket Mortgage)', 'Wells Fargo Home Mortgage', 'Chase Home Lending',
-                'Bank of America Home Loans', 'Caliber Home Loans', 'United Wholesale Mortgage',
-                'Freedom Mortgage', 'loanDepot', 'Guaranteed Rate', 'CrossCountry Mortgage',
-                'PennyMac Loan Services', 'Mr. Cooper', 'Stearns Lending', 'Guild Mortgage',
-                'Movement Mortgage', 'PrimeLending', 'Flagstar Bank', 'NewRez',
-                'AmeriHome Mortgage', 'Homebridge Financial Services', 'Carrington Mortgage Services',
-                'PHH Mortgage', 'CitiMortgage', 'U.S. Bank Home Mortgage', 'Truist Mortgage',
-                'Regions Mortgage', 'SunTrust Mortgage'
-            ];
-
-            sampleData['mortgage_lenders_2024.xlsx'] = mortgageLenders.map((name, i) => ({
-                LenderName: name,
-                LoansOriginated: Math.floor(Math.random() * 200000000000) + 10000000000,
-                MarketShare: (Math.random() * 15 + 0.5).toFixed(2) + '%',
-                Location: locations[i % locations.length],
-                Type: ['Bank', 'Non-Bank Lender', 'Credit Union'][i % 3],
-                AvgRate: (Math.random() * 2 + 6).toFixed(3) + '%',
-                Founded: Math.floor(Math.random() * 100) + 1920
-            }));
-
-            const privateEquityFirms = [
-                'Blackstone Group', 'Kohlberg Kravis Roberts', 'Apollo Global Management',
-                'Carlyle Group', 'TPG Inc.', 'Warburg Pincus', 'Bain Capital',
-                'CVC Capital Partners', 'EQT Partners', 'Advent International',
-                'Silver Lake Partners', 'Permira', 'Apax Partners', 'BC Partners',
-                'Leonard Green & Partners', 'Vista Equity Partners', 'General Atlantic',
-                'Hellman & Friedman', 'Thoma Bravo', 'Riverstone Holdings',
-                'Energy Capital Partners', 'Francisco Partners', 'GTCR'
-            ];
-
-            sampleData['private_equity_firms_2024.xlsx'] = privateEquityFirms.map((name, i) => ({
-                FirmName: name,
-                AUM: Math.floor(Math.random() * 800000000000) + 50000000000,
-                FundSize: Math.floor(Math.random() * 30000000000) + 2000000000,
-                Location: ['New York, NY', 'Boston, MA', 'San Francisco, CA', 'London, UK', 'Hong Kong'][i % 5],
-                Founded: Math.floor(Math.random() * 50) + 1970,
-                PortfolioCompanies: Math.floor(Math.random() * 200) + 20,
-                Sector: ['Technology', 'Healthcare', 'Financial Services', 'Industrial', 'Consumer', 'Energy'][i % 6]
-            }));
-        };
-
-        // Error Summary data with realistic financial institution names
-        const errorSummaryData = {
-            'Data Validation Errors': [
-                { RowNumber: 2, FieldName: 'BankName', ErrorType: 'Validation Error', Description: 'Invalid characters in JPMorgan Chase & Co. field', Severity: 'High', Status: 'Open' },
-                { RowNumber: 5, FieldName: 'Assets', ErrorType: 'Validation Error', Description: 'Negative asset value for Wells Fargo', Severity: 'High', Status: 'In Progress' },
-                { RowNumber: 8, FieldName: 'Location', ErrorType: 'Validation Error', Description: 'Invalid state code for Bank of America location', Severity: 'Medium', Status: 'Resolved' },
-                { RowNumber: 12, FieldName: 'Rating', ErrorType: 'Validation Error', Description: 'Non-standard rating format for Citigroup', Severity: 'Medium', Status: 'Open' },
-                { RowNumber: 15, FieldName: 'Employees', ErrorType: 'Validation Error', Description: 'Employee count exceeds reasonable limit for Goldman Sachs', Severity: 'Low', Status: 'In Progress' },
-                { RowNumber: 18, FieldName: 'Assets', ErrorType: 'Validation Error', Description: 'Asset format inconsistency for Morgan Stanley', Severity: 'High', Status: 'Open' },
-                { RowNumber: 21, FieldName: 'CEO', ErrorType: 'Validation Error', Description: 'Special characters in CEO name for U.S. Bancorp', Severity: 'Low', Status: 'Resolved' },
-                { RowNumber: 24, FieldName: 'Founded', ErrorType: 'Validation Error', Description: 'Future founding date for PNC Financial', Severity: 'High', Status: 'Open' },
-                { RowNumber: 27, FieldName: 'Rating', ErrorType: 'Validation Error', Description: 'Missing rating agency for Truist Financial', Severity: 'Medium', Status: 'In Progress' },
-                { RowNumber: 30, FieldName: 'Location', ErrorType: 'Validation Error', Description: 'Duplicate location entries for TD Bank', Severity: 'Low', Status: 'Open' },
-                { RowNumber: 33, FieldName: 'Assets', ErrorType: 'Validation Error', Description: 'Currency mismatch for Capital One assets', Severity: 'High', Status: 'In Progress' },
-                { RowNumber: 36, FieldName: 'Employees', ErrorType: 'Validation Error', Description: 'Zero employee count for Fifth Third Bank', Severity: 'High', Status: 'Open' },
-                { RowNumber: 39, FieldName: 'BankName', ErrorType: 'Validation Error', Description: 'Encoding issue in KeyBank name field', Severity: 'Medium', Status: 'Resolved' },
-                { RowNumber: 42, FieldName: 'CEO', ErrorType: 'Validation Error', Description: 'Missing CEO information for Regions Bank', Severity: 'Low', Status: 'Open' },
-                { RowNumber: 45, FieldName: 'Founded', ErrorType: 'Validation Error', Description: 'Invalid date format for Huntington National Bank', Severity: 'Medium', Status: 'In Progress' }
-            ],
-            'Missing Data': [
-                { RowNumber: 3, FieldName: 'Revenue', ErrorType: 'Missing Data', Description: 'Missing revenue data for BlackRock', Severity: 'High', Status: 'Open' },
-                { RowNumber: 7, FieldName: 'NetIncome', ErrorType: 'Missing Data', Description: 'Missing net income for Vanguard Group', Severity: 'High', Status: 'In Progress' },
-                { RowNumber: 11, FieldName: 'CEO', ErrorType: 'Missing Data', Description: 'Missing CEO name for State Street Global', Severity: 'Medium', Status: 'Open' },
-                { RowNumber: 14, FieldName: 'Established', ErrorType: 'Missing Data', Description: 'Missing establishment date for Fidelity Investments', Severity: 'Medium', Status: 'Resolved' },
-                { RowNumber: 17, FieldName: 'AUM', ErrorType: 'Missing Data', Description: 'Missing AUM data for BNY Mellon', Severity: 'High', Status: 'Open' },
-                { RowNumber: 20, FieldName: 'Employees', ErrorType: 'Missing Data', Description: 'Missing employee count for Charles Schwab', Severity: 'Medium', Status: 'In Progress' },
-                { RowNumber: 23, FieldName: 'Location', ErrorType: 'Missing Data', Description: 'Missing headquarters location for Navy Federal Credit Union', Severity: 'Low', Status: 'Open' },
-                { RowNumber: 26, FieldName: 'Members', ErrorType: 'Missing Data', Description: 'Missing member count for State Employees Credit Union', Severity: 'High', Status: 'In Progress' },
-                { RowNumber: 29, FieldName: 'Type', ErrorType: 'Missing Data', Description: 'Missing institution type for Pentagon Federal Credit Union', Severity: 'Medium', Status: 'Open' },
-                { RowNumber: 32, FieldName: 'Founded', ErrorType: 'Missing Data', Description: 'Missing founding year for Boeing Employees Credit Union', Severity: 'Low', Status: 'Resolved' },
-                { RowNumber: 35, FieldName: 'Assets', ErrorType: 'Missing Data', Description: 'Missing asset data for SchoolsFirst Federal Credit Union', Severity: 'High', Status: 'Open' },
-                { RowNumber: 38, FieldName: 'CEO', ErrorType: 'Missing Data', Description: 'Missing CEO information for HSBC Holdings', Severity: 'Medium', Status: 'In Progress' }
-            ],
-            'Format Errors': [
-                { RowNumber: 4, FieldName: 'Assets', ErrorType: 'Format Error', Description: 'Incorrect currency format for BNP Paribas assets', Severity: 'Medium', Status: 'Open' },
-                { RowNumber: 6, FieldName: 'Revenue', ErrorType: 'Format Error', Description: 'Scientific notation in Deutsche Bank revenue', Severity: 'Low', Status: 'Resolved' },
-                { RowNumber: 9, FieldName: 'Employees', ErrorType: 'Format Error', Description: 'Decimal places in Barclays employee count', Severity: 'Medium', Status: 'Open' },
-                { RowNumber: 13, FieldName: 'Founded', ErrorType: 'Format Error', Description: 'Text format in UBS Group founding date', Severity: 'Low', Status: 'In Progress' },
-                { RowNumber: 16, FieldName: 'Rating', ErrorType: 'Format Error', Description: 'Lowercase rating format for Royal Bank of Canada', Severity: 'Medium', Status: 'Open' },
-                { RowNumber: 19, FieldName: 'MarketCap', ErrorType: 'Format Error', Description: 'Missing currency symbol in Visa Inc. market cap', Severity: 'Low', Status: 'Resolved' },
-                { RowNumber: 22, FieldName: 'Revenue', ErrorType: 'Format Error', Description: 'Comma separator issue in Mastercard revenue', Severity: 'Medium', Status: 'Open' },
-                { RowNumber: 25, FieldName: 'CardholderBase', ErrorType: 'Format Error', Description: 'Text suffix in American Express cardholder base', Severity: 'Low', Status: 'In Progress' },
-                { RowNumber: 28, FieldName: 'MarketShare', ErrorType: 'Format Error', Description: 'Missing percentage sign for Discover Financial Services', Severity: 'Medium', Status: 'Open' },
-                { RowNumber: 31, FieldName: 'Assets', ErrorType: 'Format Error', Description: 'European number format in Berkshire Hathaway assets', Severity: 'Low', Status: 'Resolved' },
-                { RowNumber: 34, FieldName: 'Premiums', ErrorType: 'Format Error', Description: 'Inconsistent decimal places in UnitedHealth Group premiums', Severity: 'Medium', Status: 'Open' },
-                { RowNumber: 37, FieldName: 'Employees', ErrorType: 'Format Error', Description: 'Range format in Anthem Inc. employee count', Severity: 'Low', Status: 'In Progress' },
-                { RowNumber: 40, FieldName: 'Founded', ErrorType: 'Format Error', Description: 'MM/DD/YYYY format in Aetna founding date', Severity: 'Medium', Status: 'Open' },
-                { RowNumber: 43, FieldName: 'AUM', ErrorType: 'Format Error', Description: 'Abbreviation format in Cigna Corporation AUM', Severity: 'Low', Status: 'Resolved' },
-                { RowNumber: 46, FieldName: 'Revenue', ErrorType: 'Format Error', Description: 'Negative sign placement in Humana Inc. revenue', Severity: 'Medium', Status: 'Open' },
-                { RowNumber: 48, FieldName: 'Rating', ErrorType: 'Format Error', Description: 'Non-standard symbols in MetLife Inc. rating', Severity: 'Low', Status: 'In Progress' },
-                { RowNumber: 51, FieldName: 'Location', ErrorType: 'Format Error', Description: 'Full address format in Prudential Financial location', Severity: 'Medium', Status: 'Open' },
-                { RowNumber: 54, FieldName: 'CEO', ErrorType: 'Format Error', Description: 'Title included in New York Life CEO field', Severity: 'Low', Status: 'Resolved' }
-            ],
-            'Duplicate Records': [
-                { RowNumber: '15, 47', FieldName: 'BankName', ErrorType: 'Duplicate', Description: 'Duplicate entry found: JPMorgan Chase & Co.', Severity: 'High', Status: 'Open' },
-                { RowNumber: '23, 89', FieldName: 'FirmName', ErrorType: 'Duplicate', Description: 'Duplicate entry found: BlackRock', Severity: 'High', Status: 'In Progress' },
-                { RowNumber: '31, 67', FieldName: 'CompanyName', ErrorType: 'Duplicate', Description: 'Duplicate entry found: Berkshire Hathaway', Severity: 'High', Status: 'Open' },
-                { RowNumber: '42, 78', FieldName: 'UnionName', ErrorType: 'Duplicate', Description: 'Duplicate entry found: Navy Federal Credit Union', Severity: 'High', Status: 'In Progress' },
-                { RowNumber: '56, 92', FieldName: 'BankName', ErrorType: 'Duplicate', Description: 'Duplicate entry found: Wells Fargo', Severity: 'High', Status: 'Open' },
-                { RowNumber: '64, 103', FieldName: 'ExchangeName', ErrorType: 'Duplicate', Description: 'Duplicate entry found: Coinbase Pro', Severity: 'High', Status: 'Resolved' },
-                { RowNumber: '71, 98', FieldName: 'FundName', ErrorType: 'Duplicate', Description: 'Duplicate entry found: Vanguard 500 Index Fund', Severity: 'High', Status: 'Open' },
-                { RowNumber: '85, 116', FieldName: 'LenderName', ErrorType: 'Duplicate', Description: 'Duplicate entry found: Quicken Loans (Rocket Mortgage)', Severity: 'High', Status: 'In Progress' }
-            ]
-        };
-
-        // Generate additional realistic data
-        generateRealisticData();
-
-        // Initialize with sample data
-        filesData = sampleData;
-        updateFileList();
         
-        // Initialize error summary
+        // Performance optimization: Cache for search results and pre-computed strings
+        let searchCache = new Map();
+        let searchDebounceTimer = null;
+        const SEARCH_DEBOUNCE_MS = 300;
+        const MAX_DISPLAY_ROWS = 1000; // Virtual scrolling threshold
+        
+        // Pre-compute searchable strings for each row to improve search performance
+        let fileSearchIndex = {};
+
+        // Error Summary data - empty initially
+        const errorSummaryData = {
+            'Data Validation Errors': [],
+            'Missing Data': [],
+            'Format Errors': [],
+            'Duplicate Records': []
+        };
+
+        // Initialize with empty data
+        updateFileList();
         displayWorksheetData(currentWorksheet);
 
-        // Add event listener for global search box
+        // Add event listener for global search box with debouncing
         document.getElementById('globalSearchBox').addEventListener('input', function(e) {
-            currentSearchTerm = e.target.value.toLowerCase().trim();
+            const newSearchTerm = e.target.value.toLowerCase().trim();
             
-            // Check which tab is active and update accordingly
-            const activeTab = document.querySelector('.tab.active').textContent;
-            
-            if (activeTab === 'Financial Search') {
-                // Update file list and current file display
-                updateFileList();
-                if (selectedFile) {
-                    displayFileData(selectedFile);
-                }
-            } else if (activeTab === 'Error Summary') {
-                // Search in error data
-                searchInErrorData(currentSearchTerm);
+            // Clear existing timer
+            if (searchDebounceTimer) {
+                clearTimeout(searchDebounceTimer);
             }
+            
+            // Debounce search to avoid excessive re-renders
+            searchDebounceTimer = setTimeout(() => {
+                currentSearchTerm = newSearchTerm;
+                
+                // Clear cache when search term changes
+                searchCache.clear();
+                
+                // Check which tab is active and update accordingly
+                const activeTab = document.querySelector('.tab.active').textContent;
+                
+                if (activeTab === 'Financial Search') {
+                    updateFileList();
+                    if (selectedFile) {
+                        displayFileData(selectedFile);
+                    }
+                } else if (activeTab === 'Error Summary') {
+                    searchInErrorData(currentSearchTerm);
+                }
+            }, SEARCH_DEBOUNCE_MS);
         });
 
         function searchInErrorData(searchTerm) {
@@ -1501,11 +941,24 @@
 
             let filteredData = data;
             if (searchTerm) {
-                filteredData = data.filter(row => {
-                    return Object.values(row).some(value => 
-                        String(value).toLowerCase().includes(searchTerm)
-                    );
-                });
+                filteredData = [];
+                const searchLower = searchTerm.toLowerCase();
+                
+                for (let i = 0; i < data.length; i++) {
+                    const row = data[i];
+                    let matches = false;
+                    
+                    for (const key in row) {
+                        if (String(row[key]).toLowerCase().includes(searchLower)) {
+                            matches = true;
+                            break;
+                        }
+                    }
+                    
+                    if (matches) {
+                        filteredData.push(row);
+                    }
+                }
             }
 
             if (filteredData.length === 0) {
@@ -1520,50 +973,78 @@
             }
 
             const headers = Object.keys(filteredData[0]);
-            let tableHTML = `
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            ${headers.map(header => `<th>${header}</th>`).join('')}
-                        </tr>
-                    </thead>
-                    <tbody>
-            `;
-
+            
+            // Use DocumentFragment for better performance
+            const fragment = document.createDocumentFragment();
+            const table = document.createElement('table');
+            table.className = 'data-table';
+            
+            // Create header
+            const thead = document.createElement('thead');
+            const headerRow = document.createElement('tr');
+            headers.forEach(header => {
+                const th = document.createElement('th');
+                th.textContent = header;
+                headerRow.appendChild(th);
+            });
+            thead.appendChild(headerRow);
+            table.appendChild(thead);
+            
+            // Create body
+            const tbody = document.createElement('tbody');
+            
             filteredData.forEach(row => {
-                const isHighlighted = searchTerm && Object.values(row).some(value => 
-                    String(value).toLowerCase().includes(searchTerm)
-                );
+                const tr = document.createElement('tr');
                 
-                tableHTML += `<tr${isHighlighted ? ' class="highlight"' : ''}>`;
+                // Check if row matches search (for highlighting)
+                let isHighlighted = false;
+                if (searchTerm) {
+                    for (const key in row) {
+                        if (String(row[key]).toLowerCase().includes(searchTerm)) {
+                            isHighlighted = true;
+                            break;
+                        }
+                    }
+                }
+                
+                if (isHighlighted) {
+                    tr.className = 'highlight';
+                }
+                
                 headers.forEach(header => {
+                    const td = document.createElement('td');
                     let cellValue = row[header];
-                    let cellClass = '';
                     
                     // Color coding based on severity or status
                     if (header === 'Severity') {
-                        if (cellValue === 'High') cellClass = 'style="color: #dc3545; font-weight: 600;"';
-                        else if (cellValue === 'Medium') cellClass = 'style="color: #fd7e14; font-weight: 600;"';
-                        else if (cellValue === 'Low') cellClass = 'style="color: #28a745; font-weight: 600;"';
+                        if (cellValue === 'High') td.style.cssText = 'color: #dc3545; font-weight: 600;';
+                        else if (cellValue === 'Medium') td.style.cssText = 'color: #fd7e14; font-weight: 600;';
+                        else if (cellValue === 'Low') td.style.cssText = 'color: #28a745; font-weight: 600;';
                     } else if (header === 'Status') {
-                        if (cellValue === 'Open') cellClass = 'style="color: #dc3545;"';
-                        else if (cellValue === 'In Progress') cellClass = 'style="color: #ffc107;"';
-                        else if (cellValue === 'Resolved') cellClass = 'style="color: #28a745;"';
+                        if (cellValue === 'Open') td.style.color = '#dc3545';
+                        else if (cellValue === 'In Progress') td.style.color = '#ffc107';
+                        else if (cellValue === 'Resolved') td.style.color = '#28a745';
                     }
                     
                     // Highlight search terms
                     if (searchTerm && String(cellValue).toLowerCase().includes(searchTerm)) {
                         const regex = new RegExp(`(${searchTerm})`, 'gi');
-                        cellValue = String(cellValue).replace(regex, '<strong style="background-color: yellow;">$1</strong>');
+                        td.innerHTML = String(cellValue).replace(regex, '<strong style="background-color: yellow;">$1</strong>');
+                    } else {
+                        td.textContent = cellValue;
                     }
                     
-                    tableHTML += `<td ${cellClass}>${cellValue}</td>`;
+                    tr.appendChild(td);
                 });
-                tableHTML += '</tr>';
+                
+                tbody.appendChild(tr);
             });
-
-            tableHTML += '</tbody></table>';
-            container.innerHTML = tableHTML;
+            
+            table.appendChild(tbody);
+            fragment.appendChild(table);
+            
+            container.innerHTML = '';
+            container.appendChild(fragment);
         }
 
         function switchTab(tabName) {
@@ -1629,44 +1110,72 @@
             }
 
             const headers = Object.keys(data[0]);
-            let tableHTML = `
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            ${headers.map(header => `<th>${header}</th>`).join('')}
-                        </tr>
-                    </thead>
-                    <tbody>
-            `;
-
+            
+            // Use DocumentFragment for better performance
+            const fragment = document.createDocumentFragment();
+            const table = document.createElement('table');
+            table.className = 'data-table';
+            
+            // Create header
+            const thead = document.createElement('thead');
+            const headerRow = document.createElement('tr');
+            headers.forEach(header => {
+                const th = document.createElement('th');
+                th.textContent = header;
+                headerRow.appendChild(th);
+            });
+            thead.appendChild(headerRow);
+            table.appendChild(thead);
+            
+            // Create body
+            const tbody = document.createElement('tbody');
+            
             data.forEach(row => {
-                tableHTML += '<tr>';
+                const tr = document.createElement('tr');
+                
                 headers.forEach(header => {
-                    let cellValue = row[header];
-                    let cellClass = '';
+                    const td = document.createElement('td');
+                    const cellValue = row[header];
                     
                     // Color coding based on severity or status
                     if (header === 'Severity') {
-                        if (cellValue === 'High') cellClass = 'style="color: #dc3545; font-weight: 600;"';
-                        else if (cellValue === 'Medium') cellClass = 'style="color: #fd7e14; font-weight: 600;"';
-                        else if (cellValue === 'Low') cellClass = 'style="color: #28a745; font-weight: 600;"';
+                        if (cellValue === 'High') td.style.cssText = 'color: #dc3545; font-weight: 600;';
+                        else if (cellValue === 'Medium') td.style.cssText = 'color: #fd7e14; font-weight: 600;';
+                        else if (cellValue === 'Low') td.style.cssText = 'color: #28a745; font-weight: 600;';
                     } else if (header === 'Status') {
-                        if (cellValue === 'Open') cellClass = 'style="color: #dc3545;"';
-                        else if (cellValue === 'In Progress') cellClass = 'style="color: #ffc107;"';
-                        else if (cellValue === 'Resolved') cellClass = 'style="color: #28a745;"';
+                        if (cellValue === 'Open') td.style.color = '#dc3545';
+                        else if (cellValue === 'In Progress') td.style.color = '#ffc107';
+                        else if (cellValue === 'Resolved') td.style.color = '#28a745';
                     }
                     
-                    tableHTML += `<td ${cellClass}>${cellValue}</td>`;
+                    td.textContent = cellValue;
+                    tr.appendChild(td);
                 });
-                tableHTML += '</tr>';
+                
+                tbody.appendChild(tr);
             });
-
-            tableHTML += '</tbody></table>';
-            container.innerHTML = tableHTML;
+            
+            table.appendChild(tbody);
+            fragment.appendChild(table);
+            
+            container.innerHTML = '';
+            container.appendChild(fragment);
         }
 
         function updateFileList() {
             const fileList = document.getElementById('fileList');
+            
+            if (Object.keys(filesData).length === 0) {
+                fileList.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📁</div>
+                        <h3>No files uploaded</h3>
+                        <p>Click the button below to upload Excel files</p>
+                    </div>
+                `;
+                return;
+            }
+            
             fileList.innerHTML = '';
 
             Object.keys(filesData).forEach(fileName => {
@@ -1716,11 +1225,38 @@
         function getMatchCount(data, searchTerm) {
             if (!searchTerm) return 0;
             
-            return data.filter(row => {
-                return Object.values(row).some(value => 
-                    String(value).toLowerCase().includes(searchTerm)
-                );
-            }).length;
+            // Use cached result if available
+            const cacheKey = `matchCount_${selectedFile}_${searchTerm}`;
+            if (searchCache.has(cacheKey)) {
+                return searchCache.get(cacheKey);
+            }
+            
+            let count = 0;
+            const searchLower = searchTerm.toLowerCase();
+            
+            for (let i = 0; i < data.length; i++) {
+                const row = data[i];
+                for (const key in row) {
+                    if (String(row[key]).toLowerCase().includes(searchLower)) {
+                        count++;
+                        break;
+                    }
+                }
+            }
+            
+            searchCache.set(cacheKey, count);
+            return count;
+        }
+        
+        // Build search index for a file to improve search performance
+        function buildSearchIndex(fileName, data) {
+            const index = [];
+            for (let i = 0; i < data.length; i++) {
+                const row = data[i];
+                const searchStr = Object.values(row).join('|').toLowerCase();
+                index.push(searchStr);
+            }
+            fileSearchIndex[fileName] = index;
         }
 
         function displayFileData(fileName) {
@@ -1732,12 +1268,24 @@
             contentTitle.textContent = fileName;
             
             let filteredData = data;
+            const startTime = performance.now();
+            
             if (currentSearchTerm) {
-                filteredData = data.filter(row => {
-                    return Object.values(row).some(value => 
-                        String(value).toLowerCase().includes(currentSearchTerm)
-                    );
-                });
+                // Use search index if available, otherwise build it
+                if (!fileSearchIndex[fileName]) {
+                    buildSearchIndex(fileName, data);
+                }
+                
+                const searchLower = currentSearchTerm.toLowerCase();
+                const index = fileSearchIndex[fileName];
+                
+                filteredData = [];
+                for (let i = 0; i < data.length; i++) {
+                    if (index[i].includes(searchLower)) {
+                        filteredData.push(data[i]);
+                    }
+                }
+                
                 contentSubtitle.textContent = `Showing ${filteredData.length} of ${data.length} records matching "${currentSearchTerm}"`;
             } else {
                 contentSubtitle.textContent = `${data.length} total records`;
@@ -1754,40 +1302,104 @@
                 return;
             }
 
-            const headers = Object.keys(filteredData[0]);
-            let tableHTML = `
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            ${headers.map(header => `<th>${header}</th>`).join('')}
-                        </tr>
-                    </thead>
-                    <tbody>
-            `;
-
-            filteredData.forEach(row => {
-                const isHighlighted = currentSearchTerm && Object.values(row).some(value => 
-                    String(value).toLowerCase().includes(currentSearchTerm)
-                );
+            // Limit displayed rows for performance
+            const displayData = filteredData.slice(0, MAX_DISPLAY_ROWS);
+            const hasMore = filteredData.length > MAX_DISPLAY_ROWS;
+            
+            const headers = Object.keys(displayData[0]);
+            
+            // Use DocumentFragment for better performance
+            const fragment = document.createDocumentFragment();
+            const table = document.createElement('table');
+            table.className = 'data-table';
+            
+            // Create header
+            const thead = document.createElement('thead');
+            const headerRow = document.createElement('tr');
+            headers.forEach(header => {
+                const th = document.createElement('th');
+                th.textContent = header;
+                headerRow.appendChild(th);
+            });
+            thead.appendChild(headerRow);
+            table.appendChild(thead);
+            
+            // Create body
+            const tbody = document.createElement('tbody');
+            
+            displayData.forEach((row, idx) => {
+                const tr = document.createElement('tr');
                 
-                tableHTML += `<tr${isHighlighted ? ' class="highlight"' : ''}>`;
+                // Check if row matches search (for highlighting)
+                let isHighlighted = false;
+                if (currentSearchTerm) {
+                    for (const key in row) {
+                        if (String(row[key]).toLowerCase().includes(currentSearchTerm)) {
+                            isHighlighted = true;
+                            break;
+                        }
+                    }
+                }
+                
+                if (isHighlighted) {
+                    tr.className = 'highlight';
+                }
+                
                 headers.forEach(header => {
+                    const td = document.createElement('td');
                     let cellValue = row[header];
+                    
+                    // Only highlight if we have a search term and it matches
                     if (currentSearchTerm && String(cellValue).toLowerCase().includes(currentSearchTerm)) {
                         const regex = new RegExp(`(${currentSearchTerm})`, 'gi');
-                        cellValue = String(cellValue).replace(regex, '<strong style="background-color: yellow;">$1</strong>');
+                        td.innerHTML = String(cellValue).replace(regex, '<strong style="background-color: yellow;">$1</strong>');
+                    } else {
+                        td.textContent = cellValue;
                     }
-                    tableHTML += `<td>${cellValue}</td>`;
+                    
+                    tr.appendChild(td);
                 });
-                tableHTML += '</tr>';
+                
+                tbody.appendChild(tr);
             });
-
-            tableHTML += '</tbody></table>';
-            dataContainer.innerHTML = tableHTML;
+            
+            table.appendChild(tbody);
+            fragment.appendChild(table);
+            
+            // Add "load more" message if needed
+            if (hasMore) {
+                const loadMoreDiv = document.createElement('div');
+                loadMoreDiv.style.padding = '20px';
+                loadMoreDiv.style.textAlign = 'center';
+                loadMoreDiv.style.color = '#666';
+                loadMoreDiv.style.background = '#f8f9fa';
+                loadMoreDiv.style.borderTop = '1px solid #e9ecef';
+                loadMoreDiv.innerHTML = `<p><strong>Showing first ${MAX_DISPLAY_ROWS} of ${filteredData.length} matching records</strong><br/>Refine your search to see more specific results</p>`;
+                fragment.appendChild(loadMoreDiv);
+            }
+            
+            dataContainer.innerHTML = '';
+            dataContainer.appendChild(fragment);
+            
+            const endTime = performance.now();
+            console.log(`Rendered ${displayData.length} rows in ${(endTime - startTime).toFixed(2)}ms`);
         }
 
         function handleFileUpload(event) {
             const files = event.target.files;
+            let processedCount = 0;
+            const totalFiles = files.length;
+            
+            // Show loading indicator
+            const fileList = document.getElementById('fileList');
+            const loadingDiv = document.createElement('div');
+            loadingDiv.id = 'uploadLoading';
+            loadingDiv.style.padding = '20px';
+            loadingDiv.style.textAlign = 'center';
+            loadingDiv.style.color = '#4a90e2';
+            loadingDiv.innerHTML = `<p>Processing ${totalFiles} file(s)...</p>`;
+            fileList.innerHTML = '';
+            fileList.appendChild(loadingDiv);
             
             Array.from(files).forEach(file => {
                 const reader = new FileReader();
@@ -1801,14 +1413,44 @@
                         
                         if (jsonData.length > 0) {
                             filesData[file.name] = jsonData;
+                            
+                            // Build search index immediately for faster searches
+                            buildSearchIndex(file.name, jsonData);
+                            
+                            console.log(`Loaded ${file.name}: ${jsonData.length} rows`);
+                        }
+                        
+                        processedCount++;
+                        
+                        // Update loading message
+                        if (loadingDiv) {
+                            loadingDiv.innerHTML = `<p>Processing ${totalFiles} file(s)... (${processedCount}/${totalFiles})</p>`;
+                        }
+                        
+                        // Update UI when all files are processed
+                        if (processedCount === totalFiles) {
+                            if (loadingDiv) {
+                                loadingDiv.remove();
+                            }
                             updateFileList();
+                            updateComparisonFileSelects();
                         }
                     } catch (error) {
+                        console.error(`Error reading file ${file.name}:`, error);
                         alert(`Error reading file ${file.name}: ${error.message}`);
+                        
+                        processedCount++;
+                        if (processedCount === totalFiles && loadingDiv) {
+                            loadingDiv.remove();
+                            updateFileList();
+                        }
                     }
                 };
                 reader.readAsArrayBuffer(file);
             });
+            
+            // Reset file input
+            event.target.value = '';
         }
 
         // Comparator Tool Functions
@@ -1873,7 +1515,6 @@
             
             // Simulate comparison process (in real implementation, this would perform actual comparison)
             setTimeout(() => {
-                // Show a success message or update UI to indicate comparison is complete
                 alert(`Comparison completed between ${comparisonFiles.A} and ${comparisonFiles.B}!`);
             }, 500);
         }
@@ -1904,7 +1545,6 @@
 
         // Initialize comparator when DOM is loaded
         document.addEventListener('DOMContentLoaded', function() {
-            // Small delay to ensure all elements are rendered
             setTimeout(() => {
                 updateComparisonFileSelects();
                 updateCompareButtonState();
@@ -1912,4 +1552,4 @@
         });
     </script>
 </body>
-</html> '
+</html>
