@@ -126,7 +126,6 @@
         .content-wrapper {
             display: flex;
             flex: 1;
-            overflow: hidden;
         }
 
         .error-summary-content {
@@ -254,19 +253,41 @@
             padding: 10px;
             border-bottom: 1px solid #f0f0f0;
             transition: background-color 0.2s ease;
-            white-space: nowrap;
             font-size: 13px;
             min-width: 100px;
             max-width: 150px;
+            position: relative; /* CRUCIAL: Set for popover positioning */
+        }
+        
+        /* NEW POPOVER STYLES */
+        /* Style for the inner span: ensures truncation */
+        .data-table td .full-value {
+            display: block;
             overflow: hidden;
             text-overflow: ellipsis;
+            white-space: nowrap;
+            cursor: default;
         }
 
-        .data-table td:hover {
-            white-space: normal;
-            word-wrap: break-word;
-            max-width: none;
+        /* On hover, let the text flow freely, creating a popover effect */
+        .data-table td:hover .full-value {
+            position: absolute; /* Takes it out of the table flow */
+            top: -1px; /* Align to the cell's top edge */
+            left: -1px; /* Align to the cell's left edge */
+            z-index: 100;
+            padding: 10px;
+            background: #fff;
+            border: 1px solid #4a90e2;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            
+            /* Allow the text to wrap and show the full value */
+            white-space: normal; 
+            word-break: break-word;
+            max-width: 400px; /* Cap the width of the popover */
+            min-width: 150px;
+            height: auto;
         }
+        /* END NEW POPOVER STYLES */
 
         .data-table tr:hover {
             background-color: #f8f9fa;
@@ -321,355 +342,8 @@
             color: #666;
             font-style: italic;
         }
-
-        /* Comparator Tool Styles */
-        .file-select {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #e9ecef;
-            border-radius: 6px;
-            font-size: 14px;
-            background: white;
-            outline: none;
-        }
-
-        .file-select:focus {
-            border-color: #4a90e2;
-            box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.1);
-        }
-
-        .compare-btn {
-            width: 100%;
-            padding: 12px;
-            background: #28a745;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 600;
-            transition: background-color 0.2s ease;
-        }
-
-        .compare-btn:hover {
-            background: #218838;
-        }
-
-        .compare-btn:disabled {
-            background: #6c757d;
-            cursor: not-allowed;
-        }
-
-        .comparison-stats {
-            background: white;
-            border-radius: 6px;
-            padding: 15px;
-            border: 1px solid #e9ecef;
-        }
-
-        .stat-item {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 8px;
-            font-size: 13px;
-        }
-
-        .stat-item:last-child {
-            margin-bottom: 0;
-        }
-
-        .stat-label {
-            color: #666;
-        }
-
-        .stat-value {
-            font-weight: 600;
-            color: #333;
-        }
-
-        .stat-value.modified {
-            color: #fd7e14;
-        }
-
-        .stat-value.added {
-            color: #28a745;
-        }
-
-        .stat-value.removed {
-            color: #dc3545;
-        }
-
-        .comparison-tabs {
-            display: flex;
-            background: #f8f9fa;
-            border-bottom: 1px solid #e9ecef;
-            padding: 0 20px;
-            gap: 0;
-        }
-
-        .comparison-tab {
-            padding: 10px 20px;
-            background: #e9ecef;
-            border: 1px solid #dee2e6;
-            border-bottom: none;
-            cursor: pointer;
-            font-size: 14px;
-            color: #666;
-            border-radius: 4px 4px 0 0;
-            margin-right: 1px;
-            transition: all 0.2s ease;
-        }
-
-        .comparison-tab.active {
-            background: white;
-            color: #4a90e2;
-            border-color: #e9ecef;
-        }
-
-        .comparison-tab:hover:not(.active) {
-            background: #dee2e6;
-        }
-
-        .comparison-view {
-            display: none;
-            padding: 20px;
-        }
-
-        .comparison-view.active {
-            display: block;
-        }
-
-        .comparison-table {
-            width: 100%;
-            border-collapse: collapse;
-            background: white;
-            border-radius: 6px;
-            overflow: hidden;
-            border: 1px solid #e9ecef;
-        }
-
-        .comparison-table th {
-            background: #4a90e2;
-            color: white;
-            padding: 12px 10px;
-            text-align: left;
-            font-weight: 600;
-            font-size: 13px;
-            border: 1px solid #357abd;
-        }
-
-        .comparison-table td {
-            padding: 10px;
-            border: 1px solid #e9ecef;
-            font-size: 13px;
-            vertical-align: top;
-        }
-
-        .status-badge {
-            padding: 3px 8px;
-            border-radius: 12px;
-            font-size: 11px;
-            font-weight: 600;
-            text-transform: uppercase;
-        }
-
-        .status-badge.modified {
-            background: rgba(253, 126, 20, 0.1);
-            color: #fd7e14;
-        }
-
-        .status-badge.added {
-            background: rgba(40, 167, 69, 0.1);
-            color: #28a745;
-        }
-
-        .status-badge.removed {
-            background: rgba(220, 53, 69, 0.1);
-            color: #dc3545;
-        }
-
-        .status-badge.unchanged {
-            background: rgba(108, 117, 125, 0.1);
-            color: #6c757d;
-        }
-
-        .unified-comparison {
-            max-height: 600px;
-            overflow-y: auto;
-        }
-
-        .diff-section {
-            margin-bottom: 30px;
-            background: white;
-            border-radius: 8px;
-            border: 1px solid #e9ecef;
-        }
-
-        .diff-section h4 {
-            background: #f8f9fa;
-            margin: 0;
-            padding: 15px 20px;
-            border-bottom: 1px solid #e9ecef;
-            font-size: 16px;
-            color: #333;
-        }
-
-        .diff-item {
-            padding: 15px 20px;
-            border-bottom: 1px solid #f0f0f0;
-        }
-
-        .diff-item:last-child {
-            border-bottom: none;
-        }
-
-        .diff-item.added {
-            background: rgba(40, 167, 69, 0.05);
-            border-left: 4px solid #28a745;
-        }
-
-        .diff-item.removed {
-            background: rgba(220, 53, 69, 0.05);
-            border-left: 4px solid #dc3545;
-        }
-
-        .diff-header {
-            font-weight: 600;
-            margin-bottom: 10px;
-            color: #333;
-        }
-
-        .diff-changes {
-            margin-left: 15px;
-        }
-
-        .change-item {
-            margin-bottom: 8px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 14px;
-        }
-
-        .field-name {
-            font-weight: 600;
-            color: #666;
-            min-width: 80px;
-        }
-
-        .old-value {
-            background: rgba(220, 53, 69, 0.1);
-            color: #dc3545;
-            padding: 2px 6px;
-            border-radius: 4px;
-            text-decoration: line-through;
-        }
-
-        .new-value {
-            background: rgba(40, 167, 69, 0.1);
-            color: #28a745;
-            padding: 2px 6px;
-            border-radius: 4px;
-        }
-
-        .arrow {
-            color: #666;
-            font-weight: bold;
-        }
-
-        .record-details {
-            color: #666;
-            font-size: 13px;
-            margin-left: 15px;
-        }
-
-        .summary-report {
-            max-height: 600px;
-            overflow-y: auto;
-        }
-
-        .summary-section {
-            background: white;
-            border-radius: 8px;
-            border: 1px solid #e9ecef;
-            margin-bottom: 20px;
-            padding: 20px;
-        }
-
-        .summary-section h3 {
-            margin: 0 0 20px 0;
-            color: #333;
-        }
-
-        .summary-section h4 {
-            margin: 0 0 15px 0;
-            color: #333;
-            font-size: 16px;
-        }
-
-        .summary-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 15px;
-        }
-
-        .summary-card {
-            text-align: center;
-            padding: 20px;
-            background: #f8f9fa;
-            border-radius: 8px;
-            border: 1px solid #e9ecef;
-        }
-
-        .summary-number {
-            font-size: 28px;
-            font-weight: 700;
-            color: #4a90e2;
-            margin-bottom: 5px;
-        }
-
-        .summary-label {
-            color: #666;
-            font-size: 14px;
-        }
-
-        .field-changes {
-            space-y: 15px;
-        }
-
-        .field-change-item {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            margin-bottom: 15px;
-        }
-
-        .field-change-item .field-name {
-            min-width: 100px;
-            font-weight: 600;
-            color: #333;
-        }
-
-        .change-bar {
-            flex: 1;
-            height: 20px;
-            background: #f0f0f0;
-            border-radius: 10px;
-            overflow: hidden;
-        }
-
-        .change-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #4a90e2, #357abd);
-            transition: width 0.3s ease;
-        }
-
-        .change-count {
-            min-width: 80px;
-            font-size: 13px;
-            color: #666;
-            text-align: right;
-        }
+        
+        /* Removed all Comparator Tool Styles */
     </style>
 </head>
 <body>
@@ -678,7 +352,6 @@
             <div class="tabs">
                 <div class="tab active" onclick="switchTab('search')">Financial Search</div>
                 <div class="tab" onclick="switchTab('errors')">Error Summary</div>
-                <div class="tab" onclick="switchTab('comparator')">Comparator Tool</div>
             </div>
         </div>
 
@@ -743,135 +416,13 @@
                 </div>
             </div>
         </div>
-
-        <div id="comparatorTab" class="tab-content">
-            <div class="content-wrapper">
-                <div class="sidebar">
-                    <div style="padding: 20px; border-bottom: 1px solid #e9ecef;">
-                        <h3 style="margin-bottom: 15px; color: #333;">File Selection</h3>
-                        
-                        <div style="margin-bottom: 20px;">
-                            <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #666;">File A (Base)</label>
-                            <select id="fileASelect" class="file-select" onchange="selectComparisonFile('A', this.value)">
-                                <option value="">Select file...</option>
-                            </select>
-                        </div>
-                        
-                        <div style="margin-bottom: 20px;">
-                            <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #666;">File B (Compare)</label>
-                            <select id="fileBSelect" class="file-select" onchange="selectComparisonFile('B', this.value)">
-                                <option value="">Select file...</option>
-                            </select>
-                        </div>
-                        
-                        <button class="compare-btn" onclick="performComparison()" id="compareBtn">
-                            🔍 Compare Files
-                        </button>
-                    </div>
-                    
-                    <div style="padding: 20px;">
-                        <h4 style="margin-bottom: 15px; color: #333;">Comparison Options</h4>
-                        
-                        <div style="margin-bottom: 15px;">
-                            <label style="display: flex; align-items: center; cursor: pointer;">
-                                <input type="checkbox" checked style="margin-right: 8px;">
-                                <span style="font-size: 14px;">Show only differences</span>
-                            </label>
-                        </div>
-                        
-                        <div style="margin-bottom: 15px;">
-                            <label style="display: flex; align-items: center; cursor: pointer;">
-                                <input type="checkbox" checked style="margin-right: 8px;">
-                                <span style="font-size: 14px;">Highlight changes</span>
-                            </label>
-                        </div>
-                        
-                        <div style="margin-bottom: 15px;">
-                            <label style="display: flex; align-items: center; cursor: pointer;">
-                                <input type="checkbox" style="margin-right: 8px;">
-                                <span style="font-size: 14px;">Include new records</span>
-                            </label>
-                        </div>
-                        
-                        <div style="margin-bottom: 15px;">
-                            <label style="display: flex; align-items: center; cursor: pointer;">
-                                <input type="checkbox" style="margin-right: 8px;">
-                                <span style="font-size: 14px;">Include deleted records</span>
-                            </label>
-                        </div>
-                    </div>
-                    
-                    <div style="padding: 20px; border-top: 1px solid #e9ecef; background: #f8f9fa;">
-                        <div class="comparison-stats">
-                            <div class="stat-item">
-                                <span class="stat-label">Total Changes:</span>
-                                <span class="stat-value" id="totalChanges">0</span>
-                            </div>
-                            <div class="stat-item">
-                                <span class="stat-label">Modified:</span>
-                                <span class="stat-value modified" id="modifiedCount">0</span>
-                            </div>
-                            <div class="stat-item">
-                                <span class="stat-label">Added:</span>
-                                <span class="stat-value added" id="addedCount">0</span>
-                            </div>
-                            <div class="stat-item">
-                                <span class="stat-label">Removed:</span>
-                                <span class="stat-value removed" id="removedCount">0</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="main-content">
-                    <div class="content-header">
-                        <div class="content-title" id="comparatorTitle">File Comparison Results</div>
-                        <div class="content-subtitle" id="comparatorSubtitle">Select two files to compare</div>
-                    </div>
-                    
-                    <div class="comparison-tabs">
-                        <div class="comparison-tab active" onclick="switchComparisonView('side-by-side')">Side by Side</div>
-                        <div class="comparison-tab" onclick="switchComparisonView('unified')">Unified View</div>
-                        <div class="comparison-tab" onclick="switchComparisonView('summary')">Summary Report</div>
-                    </div>
-                    
-                    <div class="data-table-container" id="comparisonContainer">
-                        <div id="sideBySideView" class="comparison-view active">
-                            <div class="empty-state">
-                                <div class="empty-state-icon">🔍</div>
-                                <h3>No comparison yet</h3>
-                                <p>Select two files from the sidebar and click "Compare Files"</p>
-                            </div>
-                        </div>
-                        
-                        <div id="unifiedView" class="comparison-view">
-                            <div class="empty-state">
-                                <div class="empty-state-icon">🔍</div>
-                                <h3>No comparison yet</h3>
-                                <p>Select two files from the sidebar and click "Compare Files"</p>
-                            </div>
-                        </div>
-                        
-                        <div id="summaryView" class="comparison-view">
-                            <div class="empty-state">
-                                <div class="empty-state-icon">🔍</div>
-                                <h3>No comparison yet</h3>
-                                <p>Select two files from the sidebar and click "Compare Files"</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
         </div>
-    </div>
 
     <script>
         let filesData = {};
         let currentSearchTerm = '';
         let selectedFile = null;
         let currentWorksheet = 'Data Validation Errors';
-        let comparisonFiles = { A: null, B: null };
-        let currentComparisonView = 'side-by-side';
         
         // Performance optimization: Cache for search results and pre-computed strings
         let searchCache = new Map();
@@ -1014,26 +565,35 @@
                 headers.forEach(header => {
                     const td = document.createElement('td');
                     let cellValue = row[header];
+                    const cellText = String(cellValue);
                     
                     // Color coding based on severity or status
                     if (header === 'Severity') {
-                        if (cellValue === 'High') td.style.cssText = 'color: #dc3545; font-weight: 600;';
-                        else if (cellValue === 'Medium') td.style.cssText = 'color: #fd7e14; font-weight: 600;';
-                        else if (cellValue === 'Low') td.style.cssText = 'color: #28a745; font-weight: 600;';
+                        if (cellText === 'High') td.style.cssText = 'color: #dc3545; font-weight: 600;';
+                        else if (cellText === 'Medium') td.style.cssText = 'color: #fd7e14; font-weight: 600;';
+                        else if (cellText === 'Low') td.style.cssText = 'color: #28a745; font-weight: 600;';
                     } else if (header === 'Status') {
-                        if (cellValue === 'Open') td.style.color = '#dc3545';
-                        else if (cellValue === 'In Progress') td.style.color = '#ffc107';
-                        else if (cellValue === 'Resolved') td.style.color = '#28a745';
+                        if (cellText === 'Open') td.style.color = '#dc3545';
+                        else if (cellText === 'In Progress') td.style.color = '#ffc107';
+                        else if (cellText === 'Resolved') td.style.color = '#28a745';
                     }
                     
-                    // Highlight search terms
-                    if (searchTerm && String(cellValue).toLowerCase().includes(searchTerm)) {
+                    // Add relative position to TD for the popover
+                    td.style.position = 'relative';
+
+                    // Create the span for the content
+                    const fullValueSpan = document.createElement('span');
+                    fullValueSpan.className = 'full-value';
+                    
+                    // Highlight search terms and add to span
+                    if (searchTerm && cellText.toLowerCase().includes(searchTerm)) {
                         const regex = new RegExp(`(${searchTerm})`, 'gi');
-                        td.innerHTML = String(cellValue).replace(regex, '<strong style="background-color: yellow;">$1</strong>');
+                        fullValueSpan.innerHTML = cellText.replace(regex, '<strong style="background-color: yellow;">$1</strong>');
                     } else {
-                        td.textContent = cellValue;
+                        fullValueSpan.textContent = cellText;
                     }
                     
+                    td.appendChild(fullValueSpan);
                     tr.appendChild(td);
                 });
                 
@@ -1072,11 +632,8 @@
                 } else {
                     displayWorksheetData(currentWorksheet);
                 }
-            } else if (tabName === 'comparator') {
-                document.getElementById('comparatorTab').classList.add('active');
-                // Initialize comparator dropdowns when tab is first opened
-                updateComparisonFileSelects();
             }
+            // Comparator tab logic removed
         }
 
         function switchWorksheet(worksheetName) {
@@ -1136,19 +693,28 @@
                 headers.forEach(header => {
                     const td = document.createElement('td');
                     const cellValue = row[header];
+                    const cellText = String(cellValue);
                     
                     // Color coding based on severity or status
                     if (header === 'Severity') {
-                        if (cellValue === 'High') td.style.cssText = 'color: #dc3545; font-weight: 600;';
-                        else if (cellValue === 'Medium') td.style.cssText = 'color: #fd7e14; font-weight: 600;';
-                        else if (cellValue === 'Low') td.style.cssText = 'color: #28a745; font-weight: 600;';
+                        if (cellText === 'High') td.style.cssText = 'color: #dc3545; font-weight: 600;';
+                        else if (cellText === 'Medium') td.style.cssText = 'color: #fd7e14; font-weight: 600;';
+                        else if (cellText === 'Low') td.style.cssText = 'color: #28a745; font-weight: 600;';
                     } else if (header === 'Status') {
-                        if (cellValue === 'Open') td.style.color = '#dc3545';
-                        else if (cellValue === 'In Progress') td.style.color = '#ffc107';
-                        else if (cellValue === 'Resolved') td.style.color = '#28a745';
+                        if (cellText === 'Open') td.style.color = '#dc3545';
+                        else if (cellText === 'In Progress') td.style.color = '#ffc107';
+                        else if (cellText === 'Resolved') td.style.color = '#28a745';
                     }
                     
-                    td.textContent = cellValue;
+                    // Add relative position to TD for the popover
+                    td.style.position = 'relative';
+
+                    // Create the span for the content
+                    const fullValueSpan = document.createElement('span');
+                    fullValueSpan.className = 'full-value';
+                    fullValueSpan.textContent = cellText;
+                    
+                    td.appendChild(fullValueSpan);
                     tr.appendChild(td);
                 });
                 
@@ -1348,15 +914,25 @@
                 headers.forEach(header => {
                     const td = document.createElement('td');
                     let cellValue = row[header];
+                    const cellText = String(cellValue); // Convert to string early
                     
-                    // Only highlight if we have a search term and it matches
-                    if (currentSearchTerm && String(cellValue).toLowerCase().includes(currentSearchTerm)) {
+                    // CRUCIAL: Add relative position to TD for the popover (span) to position absolutely against it.
+                    td.style.position = 'relative'; 
+
+                    // Create the span for the content
+                    const fullValueSpan = document.createElement('span');
+                    fullValueSpan.className = 'full-value';
+
+                    // Apply highlighting logic to the span
+                    if (currentSearchTerm && cellText.toLowerCase().includes(currentSearchTerm)) {
                         const regex = new RegExp(`(${currentSearchTerm})`, 'gi');
-                        td.innerHTML = String(cellValue).replace(regex, '<strong style="background-color: yellow;">$1</strong>');
+                        fullValueSpan.innerHTML = cellText.replace(regex, '<strong style="background-color: yellow;">$1</strong>');
                     } else {
-                        td.textContent = cellValue;
+                        fullValueSpan.textContent = cellText;
                     }
                     
+                    // Append the span to the TD
+                    td.appendChild(fullValueSpan);
                     tr.appendChild(td);
                 });
                 
@@ -1433,7 +1009,6 @@
                                 loadingDiv.remove();
                             }
                             updateFileList();
-                            updateComparisonFileSelects();
                         }
                     } catch (error) {
                         console.error(`Error reading file ${file.name}:`, error);
@@ -1453,103 +1028,7 @@
             event.target.value = '';
         }
 
-        // Comparator Tool Functions
-        function updateComparisonFileSelects() {
-            const fileASelect = document.getElementById('fileASelect');
-            const fileBSelect = document.getElementById('fileBSelect');
-            
-            if (!fileASelect || !fileBSelect) return;
-            
-            // Clear existing options (except the first "Select file..." option)
-            fileASelect.innerHTML = '<option value="">Select file...</option>';
-            fileBSelect.innerHTML = '<option value="">Select file...</option>';
-            
-            // Add all available files
-            Object.keys(filesData).forEach(fileName => {
-                const optionA = document.createElement('option');
-                optionA.value = fileName;
-                optionA.textContent = fileName;
-                fileASelect.appendChild(optionA);
-                
-                const optionB = document.createElement('option');
-                optionB.value = fileName;
-                optionB.textContent = fileName;
-                fileBSelect.appendChild(optionB);
-            });
-        }
-
-        function selectComparisonFile(fileType, fileName) {
-            comparisonFiles[fileType] = fileName;
-            updateCompareButtonState();
-        }
-
-        function updateCompareButtonState() {
-            const compareBtn = document.getElementById('compareBtn');
-            if (!compareBtn) return;
-            
-            const hasValidSelection = comparisonFiles.A && comparisonFiles.B && comparisonFiles.A !== comparisonFiles.B;
-            
-            compareBtn.disabled = !hasValidSelection;
-            
-            if (hasValidSelection) {
-                compareBtn.style.background = '#28a745';
-                compareBtn.style.cursor = 'pointer';
-            } else {
-                compareBtn.style.background = '#6c757d';
-                compareBtn.style.cursor = 'not-allowed';
-            }
-        }
-
-        function performComparison() {
-            if (!comparisonFiles.A || !comparisonFiles.B || comparisonFiles.A === comparisonFiles.B) {
-                alert('Please select two different files to compare.');
-                return;
-            }
-            
-            // Update the comparison title
-            const titleElement = document.getElementById('comparatorTitle');
-            const subtitleElement = document.getElementById('comparatorSubtitle');
-            
-            if (titleElement) titleElement.textContent = 'File Comparison Results';
-            if (subtitleElement) subtitleElement.textContent = `${comparisonFiles.A} vs ${comparisonFiles.B}`;
-            
-            // Simulate comparison process (in real implementation, this would perform actual comparison)
-            setTimeout(() => {
-                alert(`Comparison completed between ${comparisonFiles.A} and ${comparisonFiles.B}!`);
-            }, 500);
-        }
-
-        function switchComparisonView(viewType) {
-            // Update tab buttons
-            document.querySelectorAll('.comparison-tab').forEach(tab => tab.classList.remove('active'));
-            if (event && event.target) {
-                event.target.classList.add('active');
-            }
-            
-            // Update view content
-            document.querySelectorAll('.comparison-view').forEach(view => view.classList.remove('active'));
-            
-            currentComparisonView = viewType;
-            
-            if (viewType === 'side-by-side') {
-                const element = document.getElementById('sideBySideView');
-                if (element) element.classList.add('active');
-            } else if (viewType === 'unified') {
-                const element = document.getElementById('unifiedView');
-                if (element) element.classList.add('active');
-            } else if (viewType === 'summary') {
-                const element = document.getElementById('summaryView');
-                if (element) element.classList.add('active');
-            }
-        }
-
-        // Initialize comparator when DOM is loaded
-        document.addEventListener('DOMContentLoaded', function() {
-            setTimeout(() => {
-                updateComparisonFileSelects();
-                updateCompareButtonState();
-            }, 100);
-        });
+        // Removed all Comparator Tool Functions
     </script>
 </body>
 </html>
