@@ -97,18 +97,30 @@
             border-color: #e9ecef;
         }
 
+        /* ---------------------------------------------------- */
+        /* HEADER CHANGE: Align Button and Search Box */
+        /* ---------------------------------------------------- */
         .search-header {
             padding: 15px 20px;
             background: white;
             border-bottom: 1px solid #e9ecef;
-            display: flex;
-            justify-content: center;
+            display: flex; /* NEW: Use flexbox for alignment */
             align-items: center;
+            gap: 20px; /* Spacing between button and search box */
+        }
+
+        .upload-section {
+            padding: 0; 
+            background: transparent;
+            border: none;
+            position: static;
+            width: auto;
+            flex-shrink: 0; /* Prevent the button from being compressed */
         }
 
         .search-box {
-            width: 100%;
-            max-width: 400px;
+            /* NEW: Let search box take remaining space */
+            flex: 1; 
             padding: 12px 16px;
             border: 2px solid #e9ecef;
             border-radius: 8px;
@@ -117,6 +129,9 @@
             transition: all 0.2s ease;
             background: white;
         }
+        /* ---------------------------------------------------- */
+        /* END HEADER CHANGE */
+        /* ---------------------------------------------------- */
 
         .search-box:focus {
             border-color: #4a90e2;
@@ -140,14 +155,16 @@
             border-right: 1px solid #e9ecef;
             display: flex;
             flex-direction: column;
+            position: relative;
+            overflow: auto; 
         }
 
         .file-list {
-            flex: 1;
-            overflow-y: auto;
+            flex: 1; 
+            overflow-y: auto; 
             padding: 10px;
         }
-
+        
         .file-item {
             padding: 15px;
             margin: 5px 10px;
@@ -156,6 +173,14 @@
             cursor: pointer;
             transition: all 0.2s ease;
             border: 1px solid #e9ecef;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .file-item-content { 
+            flex-grow: 1;
+            padding-right: 10px;
         }
 
         .file-item:hover {
@@ -177,6 +202,8 @@
             font-weight: 600;
             font-size: 16px;
             margin-bottom: 5px;
+            display: flex;
+            align-items: center;
         }
 
         .file-info {
@@ -192,6 +219,26 @@
             font-size: 11px;
             font-weight: 600;
             margin-left: 8px;
+        }
+
+        .delete-btn { 
+            background: none;
+            border: none;
+            color: #dc3545;
+            cursor: pointer;
+            font-size: 18px;
+            padding: 5px;
+            margin-left: 10px;
+            transition: color 0.2s ease;
+            line-height: 1;
+        }
+        
+        .file-item.active .delete-btn {
+            color: white; 
+        }
+
+        .delete-btn:hover {
+            color: #c82333;
         }
 
         .main-content {
@@ -256,11 +303,10 @@
             font-size: 13px;
             min-width: 100px;
             max-width: 150px;
-            position: relative; /* CRUCIAL: Set for popover positioning */
+            position: relative; 
         }
         
         /* NEW POPOVER STYLES */
-        /* Style for the inner span: ensures truncation */
         .data-table td .full-value {
             display: block;
             overflow: hidden;
@@ -269,21 +315,19 @@
             cursor: default;
         }
 
-        /* On hover, let the text flow freely, creating a popover effect */
         .data-table td:hover .full-value {
-            position: absolute; /* Takes it out of the table flow */
-            top: -1px; /* Align to the cell's top edge */
-            left: -1px; /* Align to the cell's left edge */
+            position: absolute; 
+            top: -1px; 
+            left: -1px; 
             z-index: 100;
             padding: 10px;
             background: #fff;
             border: 1px solid #4a90e2;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             
-            /* Allow the text to wrap and show the full value */
             white-space: normal; 
             word-break: break-word;
-            max-width: 400px; /* Cap the width of the popover */
+            max-width: 400px; 
             min-width: 150px;
             height: auto;
         }
@@ -309,14 +353,8 @@
             opacity: 0.3;
         }
 
-        .upload-section {
-            padding: 15px;
-            border-top: 1px solid #e9ecef;
-            background: #f8f9fa;
-        }
-
         .upload-btn {
-            width: 100%;
+            width: 200px; 
             padding: 10px;
             background: #4a90e2;
             color: white;
@@ -342,8 +380,6 @@
             color: #666;
             font-style: italic;
         }
-        
-        /* Removed all Comparator Tool Styles */
     </style>
 </head>
 <body>
@@ -356,6 +392,11 @@
         </div>
 
         <div class="search-header">
+            <div class="upload-section">
+                <button class="upload-btn" onclick="document.getElementById('fileInput').click()">
+                    📂 Upload Excel Files
+                </button>
+            </div>
             <input type="text" class="search-box" id="globalSearchBox" placeholder="Search across all data...">
         </div>
 
@@ -366,14 +407,8 @@
                         <div class="empty-state">
                             <div class="empty-state-icon">📁</div>
                             <h3>No files uploaded</h3>
-                            <p>Click the button below to upload Excel files</p>
+                            <p>Click the button above to upload Excel files</p>
                         </div>
-                    </div>
-                    <div class="upload-section">
-                        <button class="upload-btn" onclick="document.getElementById('fileInput').click()">
-                            📂 Upload Excel Files
-                        </button>
-                        <input type="file" id="fileInput" class="file-input" multiple accept=".xlsx,.xls" onchange="handleFileUpload(event)">
                     </div>
                 </div>
 
@@ -416,7 +451,9 @@
                 </div>
             </div>
         </div>
-        </div>
+    </div>
+    
+    <input type="file" id="fileInput" class="file-input" multiple accept=".xlsx,.xls,.csv,.ods" onchange="handleFileUpload(event)">
 
     <script>
         let filesData = {};
@@ -424,16 +461,13 @@
         let selectedFile = null;
         let currentWorksheet = 'Data Validation Errors';
         
-        // Performance optimization: Cache for search results and pre-computed strings
         let searchCache = new Map();
         let searchDebounceTimer = null;
         const SEARCH_DEBOUNCE_MS = 300;
-        const MAX_DISPLAY_ROWS = 1000; // Virtual scrolling threshold
+        const MAX_DISPLAY_ROWS = 300;
         
-        // Pre-compute searchable strings for each row to improve search performance
         let fileSearchIndex = {};
 
-        // Error Summary data - empty initially
         const errorSummaryData = {
             'Data Validation Errors': [],
             'Missing Data': [],
@@ -445,23 +479,18 @@
         updateFileList();
         displayWorksheetData(currentWorksheet);
 
-        // Add event listener for global search box with debouncing
         document.getElementById('globalSearchBox').addEventListener('input', function(e) {
             const newSearchTerm = e.target.value.toLowerCase().trim();
             
-            // Clear existing timer
             if (searchDebounceTimer) {
                 clearTimeout(searchDebounceTimer);
             }
             
-            // Debounce search to avoid excessive re-renders
             searchDebounceTimer = setTimeout(() => {
                 currentSearchTerm = newSearchTerm;
                 
-                // Clear cache when search term changes
                 searchCache.clear();
                 
-                // Check which tab is active and update accordingly
                 const activeTab = document.querySelector('.tab.active').textContent;
                 
                 if (activeTab === 'Financial Search') {
@@ -525,7 +554,6 @@
 
             const headers = Object.keys(filteredData[0]);
             
-            // Use DocumentFragment for better performance
             const fragment = document.createDocumentFragment();
             const table = document.createElement('table');
             table.className = 'data-table';
@@ -578,14 +606,12 @@
                         else if (cellText === 'Resolved') td.style.color = '#28a745';
                     }
                     
-                    // Add relative position to TD for the popover
                     td.style.position = 'relative';
 
-                    // Create the span for the content
                     const fullValueSpan = document.createElement('span');
                     fullValueSpan.className = 'full-value';
                     
-                    // Highlight search terms and add to span
+                    // Highlight search terms
                     if (searchTerm && cellText.toLowerCase().includes(searchTerm)) {
                         const regex = new RegExp(`(${searchTerm})`, 'gi');
                         fullValueSpan.innerHTML = cellText.replace(regex, '<strong style="background-color: yellow;">$1</strong>');
@@ -608,16 +634,13 @@
         }
 
         function switchTab(tabName) {
-            // Update tab buttons
             document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
             event.target.classList.add('active');
             
-            // Update tab content
             document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
             
             if (tabName === 'search') {
                 document.getElementById('searchTab').classList.add('active');
-                // Refresh search results if there's a search term
                 if (currentSearchTerm) {
                     updateFileList();
                     if (selectedFile) {
@@ -626,24 +649,20 @@
                 }
             } else if (tabName === 'errors') {
                 document.getElementById('errorsTab').classList.add('active');
-                // Apply current search if there is one
                 if (currentSearchTerm) {
                     searchInErrorData(currentSearchTerm);
                 } else {
                     displayWorksheetData(currentWorksheet);
                 }
             }
-            // Comparator tab logic removed
         }
 
         function switchWorksheet(worksheetName) {
-            // Update worksheet tab buttons
             document.querySelectorAll('.worksheet-tab').forEach(tab => tab.classList.remove('active'));
             event.target.classList.add('active');
             
             currentWorksheet = worksheetName;
             
-            // Apply current search if there is one
             if (currentSearchTerm) {
                 searchInErrorData(currentSearchTerm);
             } else {
@@ -668,12 +687,10 @@
 
             const headers = Object.keys(data[0]);
             
-            // Use DocumentFragment for better performance
             const fragment = document.createDocumentFragment();
             const table = document.createElement('table');
             table.className = 'data-table';
             
-            // Create header
             const thead = document.createElement('thead');
             const headerRow = document.createElement('tr');
             headers.forEach(header => {
@@ -684,7 +701,6 @@
             thead.appendChild(headerRow);
             table.appendChild(thead);
             
-            // Create body
             const tbody = document.createElement('tbody');
             
             data.forEach(row => {
@@ -695,7 +711,6 @@
                     const cellValue = row[header];
                     const cellText = String(cellValue);
                     
-                    // Color coding based on severity or status
                     if (header === 'Severity') {
                         if (cellText === 'High') td.style.cssText = 'color: #dc3545; font-weight: 600;';
                         else if (cellText === 'Medium') td.style.cssText = 'color: #fd7e14; font-weight: 600;';
@@ -706,10 +721,8 @@
                         else if (cellText === 'Resolved') td.style.color = '#28a745';
                     }
                     
-                    // Add relative position to TD for the popover
                     td.style.position = 'relative';
 
-                    // Create the span for the content
                     const fullValueSpan = document.createElement('span');
                     fullValueSpan.className = 'full-value';
                     fullValueSpan.textContent = cellText;
@@ -728,6 +741,61 @@
             container.appendChild(fragment);
         }
 
+        // 🚨 UPDATED FUNCTION: Truncate file path to last 3 components (2 parents + file), without ellipsis
+        function getDisplayFileName(fileName) {
+            // Split the path by both forward (/) and backward (\) slashes
+            const parts = fileName.split(/[\\/]/); 
+            
+            // Get the last 3 parts (the file and its two parent directories)
+            // startIndex is the index of the 3rd-to-last element.
+            const startIndex = Math.max(0, parts.length - 3); 
+            const displayParts = parts.slice(startIndex);
+            
+            // Join them back. Since the slice handles the truncation, 
+            // no need for conditional logic or an ellipsis prefix.
+            return displayParts.join('/');
+        }
+
+        // Handles file removal
+        function removeFile(fileName) {
+            // Use truncated name in confirmation prompt
+            if (!confirm(`Are you sure you want to remove the file "${getDisplayFileName(fileName)}"?`)) {
+                return;
+            }
+
+            // 1. Remove data and index
+            delete filesData[fileName];
+            delete fileSearchIndex[fileName];
+            
+            // 2. Update selected file state
+            if (selectedFile === fileName) {
+                const remainingFiles = Object.keys(filesData);
+                if (remainingFiles.length > 0) {
+                    selectedFile = remainingFiles[0];
+                    displayFileData(selectedFile);
+                } else {
+                    selectedFile = null;
+                    // Reset main content to empty state
+                    document.getElementById('dataContainer').innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-state-icon">📊</div>
+                            <h3>No file selected</h3>
+                            <p>Upload Excel files and select one from the left to view its contents</p>
+                        </div>
+                    `;
+                    document.getElementById('contentTitle').textContent = 'Select a file to view data';
+                    document.getElementById('contentSubtitle').textContent = 'Upload Excel files and use the search to filter results';
+                }
+            }
+
+            // 3. Refresh UI
+            updateFileList();
+            if (selectedFile && selectedFile !== fileName) {
+                 // Ensure the current selection is re-rendered if a file was deleted but the selection shifted
+                displayFileData(selectedFile);
+            }
+        }
+
         function updateFileList() {
             const fileList = document.getElementById('fileList');
             
@@ -736,7 +804,7 @@
                     <div class="empty-state">
                         <div class="empty-state-icon">📁</div>
                         <h3>No files uploaded</h3>
-                        <p>Click the button below to upload Excel files</p>
+                        <p>Click the button above to upload Excel files</p>
                     </div>
                 `;
                 return;
@@ -760,26 +828,45 @@
                 if (selectedFile === fileName) {
                     fileItem.classList.add('active');
                 }
-
-                fileItem.innerHTML = `
+                
+                // Content wrapper for flex layout
+                const contentWrapper = document.createElement('div');
+                contentWrapper.className = 'file-item-content';
+                contentWrapper.innerHTML = `
                     <div class="file-name">
-                        ${fileName}
+                        ${getDisplayFileName(fileName)}
                         ${matchCount > 0 && currentSearchTerm ? `<span class="match-count">${matchCount} matches</span>` : ''}
                     </div>
                     <div class="file-info">${data.length} records</div>
                 `;
 
+                // Delete button
+                const deleteButton = document.createElement('button');
+                deleteButton.className = 'delete-btn';
+                deleteButton.innerHTML = '🗑️'; 
+                deleteButton.title = `Remove ${getDisplayFileName(fileName)}`;
+                deleteButton.onclick = (e) => { 
+                    e.stopPropagation(); 
+                    removeFile(fileName);
+                };
+
+                fileItem.appendChild(contentWrapper);
+                fileItem.appendChild(deleteButton);
+
+
                 fileItem.addEventListener('click', () => {
-                    document.querySelectorAll('.file-item').forEach(item => item.classList.remove('active'));
-                    fileItem.classList.add('active');
-                    selectedFile = fileName;
-                    displayFileData(fileName);
+                    // Only handle file selection if the delete button wasn't clicked
+                    if (!event.target.classList.contains('delete-btn')) {
+                        document.querySelectorAll('.file-item').forEach(item => item.classList.remove('active'));
+                        fileItem.classList.add('active');
+                        selectedFile = fileName;
+                        displayFileData(fileName);
+                    }
                 });
 
                 fileList.appendChild(fileItem);
             });
 
-            // Show "no results" message if all files are hidden
             if (currentSearchTerm && document.querySelectorAll('.file-item:not(.hidden)').length === 0) {
                 const noResults = document.createElement('div');
                 noResults.className = 'no-results';
@@ -791,7 +878,6 @@
         function getMatchCount(data, searchTerm) {
             if (!searchTerm) return 0;
             
-            // Use cached result if available
             const cacheKey = `matchCount_${selectedFile}_${searchTerm}`;
             if (searchCache.has(cacheKey)) {
                 return searchCache.get(cacheKey);
@@ -800,12 +886,22 @@
             let count = 0;
             const searchLower = searchTerm.toLowerCase();
             
-            for (let i = 0; i < data.length; i++) {
-                const row = data[i];
-                for (const key in row) {
-                    if (String(row[key]).toLowerCase().includes(searchLower)) {
+            const fileName = Object.keys(filesData).find(key => filesData[key] === data);
+            if (fileName && fileSearchIndex[fileName]) {
+                const index = fileSearchIndex[fileName];
+                for (let i = 0; i < index.length; i++) {
+                    if (index[i].includes(searchLower)) {
                         count++;
-                        break;
+                    }
+                }
+            } else {
+                for (let i = 0; i < data.length; i++) {
+                    const row = data[i];
+                    for (const key in row) {
+                        if (String(row[key]).toLowerCase().includes(searchLower)) {
+                            count++;
+                            break;
+                        }
                     }
                 }
             }
@@ -814,12 +910,11 @@
             return count;
         }
         
-        // Build search index for a file to improve search performance
         function buildSearchIndex(fileName, data) {
             const index = [];
             for (let i = 0; i < data.length; i++) {
                 const row = data[i];
-                const searchStr = Object.values(row).join('|').toLowerCase();
+                const searchStr = Object.values(row).map(v => v === null || v === undefined ? '' : String(v)).join('|').toLowerCase();
                 index.push(searchStr);
             }
             fileSearchIndex[fileName] = index;
@@ -831,13 +926,13 @@
             const contentSubtitle = document.getElementById('contentSubtitle');
             const dataContainer = document.getElementById('dataContainer');
 
-            contentTitle.textContent = fileName;
+            // Use truncated name in header
+            contentTitle.textContent = getDisplayFileName(fileName);
             
             let filteredData = data;
             const startTime = performance.now();
             
             if (currentSearchTerm) {
-                // Use search index if available, otherwise build it
                 if (!fileSearchIndex[fileName]) {
                     buildSearchIndex(fileName, data);
                 }
@@ -868,18 +963,15 @@
                 return;
             }
 
-            // Limit displayed rows for performance
             const displayData = filteredData.slice(0, MAX_DISPLAY_ROWS);
             const hasMore = filteredData.length > MAX_DISPLAY_ROWS;
             
             const headers = Object.keys(displayData[0]);
             
-            // Use DocumentFragment for better performance
             const fragment = document.createDocumentFragment();
             const table = document.createElement('table');
             table.className = 'data-table';
             
-            // Create header
             const thead = document.createElement('thead');
             const headerRow = document.createElement('tr');
             headers.forEach(header => {
@@ -890,17 +982,16 @@
             thead.appendChild(headerRow);
             table.appendChild(thead);
             
-            // Create body
             const tbody = document.createElement('tbody');
             
             displayData.forEach((row, idx) => {
                 const tr = document.createElement('tr');
                 
-                // Check if row matches search (for highlighting)
                 let isHighlighted = false;
                 if (currentSearchTerm) {
+                    const searchLower = currentSearchTerm.toLowerCase();
                     for (const key in row) {
-                        if (String(row[key]).toLowerCase().includes(currentSearchTerm)) {
+                        if (String(row[key]).toLowerCase().includes(searchLower)) {
                             isHighlighted = true;
                             break;
                         }
@@ -914,16 +1005,13 @@
                 headers.forEach(header => {
                     const td = document.createElement('td');
                     let cellValue = row[header];
-                    const cellText = String(cellValue); // Convert to string early
+                    const cellText = String(cellValue);
                     
-                    // CRUCIAL: Add relative position to TD for the popover (span) to position absolutely against it.
                     td.style.position = 'relative'; 
 
-                    // Create the span for the content
                     const fullValueSpan = document.createElement('span');
                     fullValueSpan.className = 'full-value';
 
-                    // Apply highlighting logic to the span
                     if (currentSearchTerm && cellText.toLowerCase().includes(currentSearchTerm)) {
                         const regex = new RegExp(`(${currentSearchTerm})`, 'gi');
                         fullValueSpan.innerHTML = cellText.replace(regex, '<strong style="background-color: yellow;">$1</strong>');
@@ -931,7 +1019,6 @@
                         fullValueSpan.textContent = cellText;
                     }
                     
-                    // Append the span to the TD
                     td.appendChild(fullValueSpan);
                     tr.appendChild(td);
                 });
@@ -942,7 +1029,6 @@
             table.appendChild(tbody);
             fragment.appendChild(table);
             
-            // Add "load more" message if needed
             if (hasMore) {
                 const loadMoreDiv = document.createElement('div');
                 loadMoreDiv.style.padding = '20px';
@@ -950,6 +1036,7 @@
                 loadMoreDiv.style.color = '#666';
                 loadMoreDiv.style.background = '#f8f9fa';
                 loadMoreDiv.style.borderTop = '1px solid #e9ecef';
+                // Message reflects the new 300 row limit
                 loadMoreDiv.innerHTML = `<p><strong>Showing first ${MAX_DISPLAY_ROWS} of ${filteredData.length} matching records</strong><br/>Refine your search to see more specific results</p>`;
                 fragment.appendChild(loadMoreDiv);
             }
@@ -966,7 +1053,6 @@
             let processedCount = 0;
             const totalFiles = files.length;
             
-            // Show loading indicator
             const fileList = document.getElementById('fileList');
             const loadingDiv = document.createElement('div');
             loadingDiv.id = 'uploadLoading';
@@ -974,61 +1060,78 @@
             loadingDiv.style.textAlign = 'center';
             loadingDiv.style.color = '#4a90e2';
             loadingDiv.innerHTML = `<p>Processing ${totalFiles} file(s)...</p>`;
-            fileList.innerHTML = '';
-            fileList.appendChild(loadingDiv);
             
-            Array.from(files).forEach(file => {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    try {
-                        const data = new Uint8Array(e.target.result);
-                        const workbook = XLSX.read(data, { type: 'array' });
-                        const firstSheetName = workbook.SheetNames[0];
-                        const worksheet = workbook.Sheets[firstSheetName];
-                        const jsonData = XLSX.utils.sheet_to_json(worksheet);
-                        
-                        if (jsonData.length > 0) {
-                            filesData[file.name] = jsonData;
+            // Append loading message
+            if (totalFiles > 0) {
+                // Prepend loading message to keep it visible at the top of the scrolling list
+                 fileList.prepend(loadingDiv); 
+            }
+
+            const filePromises = Array.from(files).map(file => {
+                return new Promise(resolve => {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        try {
+                            const data = new Uint8Array(e.target.result);
+                            const workbook = XLSX.read(data, { type: 'array' });
+                            const firstSheetName = workbook.SheetNames[0];
+                            const worksheet = workbook.Sheets[firstSheetName];
                             
-                            // Build search index immediately for faster searches
-                            buildSearchIndex(file.name, jsonData);
+                            const jsonData = XLSX.utils.sheet_to_json(worksheet);
                             
-                            console.log(`Loaded ${file.name}: ${jsonData.length} rows`);
+                            if (jsonData.length > 0) {
+                                // Add or overwrite existing file with the same name (Incremental Upload)
+                                filesData[file.name] = jsonData;
+                                buildSearchIndex(file.name, jsonData);
+                                console.log(`Loaded ${file.name}: ${jsonData.length} rows`);
+                            }
+
+                        } catch (error) {
+                            console.error(`Error reading file ${file.name}:`, error);
+                            alert(`Error reading file ${file.name}: ${error.message}`);
                         }
                         
                         processedCount++;
-                        
-                        // Update loading message
                         if (loadingDiv) {
                             loadingDiv.innerHTML = `<p>Processing ${totalFiles} file(s)... (${processedCount}/${totalFiles})</p>`;
                         }
-                        
-                        // Update UI when all files are processed
-                        if (processedCount === totalFiles) {
-                            if (loadingDiv) {
-                                loadingDiv.remove();
-                            }
-                            updateFileList();
-                        }
-                    } catch (error) {
-                        console.error(`Error reading file ${file.name}:`, error);
-                        alert(`Error reading file ${file.name}: ${error.message}`);
-                        
+                        resolve(); 
+                    };
+                    reader.onerror = () => {
+                        console.error(`File read error for ${file.name}`);
                         processedCount++;
-                        if (processedCount === totalFiles && loadingDiv) {
-                            loadingDiv.remove();
-                            updateFileList();
+                        if (loadingDiv) {
+                            loadingDiv.innerHTML = `<p>Processing ${totalFiles} file(s)... (${processedCount}/${totalFiles})</p>`;
                         }
+                        resolve();
+                    };
+                    reader.readAsArrayBuffer(file);
+                });
+            });
+
+            Promise.all(filePromises).then(() => {
+                if (loadingDiv) {
+                    loadingDiv.remove();
+                }
+
+                if (Object.keys(filesData).length > 0) {
+                    // Only select the *first* newly uploaded file if no file is currently selected
+                    if (!selectedFile || files.length > 0) {
+                         const newFiles = Array.from(files).map(f => f.name).filter(name => filesData[name]);
+                         selectedFile = newFiles.length > 0 ? newFiles[0] : Object.keys(filesData)[0];
                     }
-                };
-                reader.readAsArrayBuffer(file);
+                    displayFileData(selectedFile);
+                } else {
+                    // Keep the empty state if nothing was uploaded/parsed
+                    selectedFile = null;
+                }
+                updateFileList();
             });
             
             // Reset file input
             event.target.value = '';
         }
 
-        // Removed all Comparator Tool Functions
     </script>
 </body>
 </html>
