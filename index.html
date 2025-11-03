@@ -98,15 +98,30 @@
         }
 
         /* ---------------------------------------------------- */
-        /* HEADER CHANGE: Align Button and Search Box */
+        /* NAGŁÓWEK */
         /* ---------------------------------------------------- */
-        .search-header {
-            padding: 15px 20px;
+        .search-header-wrapper {
             background: white;
             border-bottom: 1px solid #e9ecef;
-            display: flex; /* NEW: Use flexbox for alignment */
+            display: flex; 
+            align-items: stretch;
+            padding: 0;
+        }
+
+        .sidebar-mock {
+            width: 350px; 
+            display: flex;
             align-items: center;
-            gap: 20px; /* Spacing between button and search box */
+            padding: 15px 20px; 
+            box-sizing: border-box;
+        }
+        
+        .search-bar-content {
+            flex: 1; 
+            padding: 15px 20px; 
+            box-sizing: border-box;
+            display: flex;
+            align-items: center;
         }
 
         .upload-section {
@@ -115,22 +130,41 @@
             border: none;
             position: static;
             width: auto;
-            flex-shrink: 0; /* Prevent the button from being compressed */
+            flex-shrink: 0; 
         }
 
+        /* ZWIĘKSZONY PRZYCISK */
+        .upload-btn {
+            width: 220px; /* Zwiększone z 200px */
+            padding: 12px; /* Zwiększone z 10px */
+            background: #4a90e2;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 15px; /* Zwiększone z 14px */
+            font-weight: 500;
+            transition: background-color 0.2s ease;
+        }
+
+        .upload-btn:hover {
+            background: #357abd;
+        }
+
+        /* ZWIĘKSZONE POLE WYSZUKIWANIA */
         .search-box {
-            /* NEW: Let search box take remaining space */
             flex: 1; 
-            padding: 12px 16px;
+            width: 100%;
+            padding: 14px 16px; /* Zwiększone z 12px */
             border: 2px solid #e9ecef;
             border-radius: 8px;
-            font-size: 16px;
+            font-size: 17px; /* Zwiększone z 16px */
             outline: none;
             transition: all 0.2s ease;
             background: white;
         }
         /* ---------------------------------------------------- */
-        /* END HEADER CHANGE */
+        /* KONIEC ZMIAN W NAGŁÓWKU */
         /* ---------------------------------------------------- */
 
         .search-box:focus {
@@ -362,23 +396,6 @@
             opacity: 0.3;
         }
 
-        .upload-btn {
-            width: 200px; 
-            padding: 10px;
-            background: #4a90e2;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 500;
-            transition: background-color 0.2s ease;
-        }
-
-        .upload-btn:hover {
-            background: #357abd;
-        }
-
         .file-input {
             display: none;
         }
@@ -400,13 +417,17 @@
             </div>
         </div>
 
-        <div class="search-header">
-            <div class="upload-section">
-                <button class="upload-btn" onclick="document.getElementById('fileInput').click()">
-                    📂 Upload Excel Files
-                </button>
+        <div class="search-header-wrapper">
+            <div class="sidebar-mock">
+                <div class="upload-section">
+                    <button class="upload-btn" onclick="document.getElementById('fileInput').click()">
+                        📂 Upload Excel Files
+                    </button>
+                </div>
             </div>
-            <input type="text" class="search-box" id="globalSearchBox" placeholder="Search across all data...">
+            <div class="search-bar-content">
+                <input type="text" class="search-box" id="globalSearchBox" placeholder="Search across all data...">
+            </div>
         </div>
 
         <div id="searchTab" class="tab-content active">
@@ -488,7 +509,6 @@
         updateFileList();
         displayWorksheetData(currentWorksheet);
 
-        // --- ZMODYFIKOWANA FUNKCJA OBSŁUGI WYSZUKIWANIA (POPRAWKA 1) ---
         document.getElementById('globalSearchBox').addEventListener('input', function(e) {
             const newSearchTerm = e.target.value.toLowerCase().trim();
             
@@ -512,7 +532,7 @@
                         // Sprawdza, czy wybrany plik jest nadal widoczny (tzn. ma dopasowania)
                         const selectedFileMatches = filesData[selectedFile] && getMatchCount(filesData[selectedFile], currentSearchTerm) > 0;
                         
-                        // JEŚLI JEST WYSZUKIWANIE I PLIK NIE PASUJE LUB PLIK ZACZĄŁ PASOWAĆ PO ZMIANIE FRAZY
+                        // JEŚLI JEST WYSZUKIWANIE I PLIK NIE PASUJE
                         if (currentSearchTerm && !selectedFileMatches) {
                             // Jeśli plik jest wybrany, ale przestaje pasować do frazy wyszukiwania
                             selectedFile = null;
@@ -541,7 +561,6 @@
                 }
             }, SEARCH_DEBOUNCE_MS);
         });
-        // --- KONIEC ZMODYFIKOWANEJ FUNKCJI ---
 
         function searchInErrorData(searchTerm) {
             const data = errorSummaryData[currentWorksheet];
