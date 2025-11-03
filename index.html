@@ -220,6 +220,11 @@
             font-weight: 600;
             margin-left: 8px;
         }
+        
+        .file-item.active .match-count {
+            background: rgba(255, 255, 255, 0.3);
+            color: white;
+        }
 
         .delete-btn { 
             background: none;
@@ -239,6 +244,10 @@
 
         .delete-btn:hover {
             color: #c82333;
+        }
+        
+        .file-item.active .delete-btn:hover {
+             color: #ffcccc; /* Light red on active state hover */
         }
 
         .main-content {
@@ -386,8 +395,8 @@
     <div class="container">
         <div class="tabs-container">
             <div class="tabs">
-                <div class="tab active" onclick="switchTab('search')">Financial Search</div>
-                <div class="tab" onclick="switchTab('errors')">Error Summary</div>
+                <div class="tab active" onclick="switchTab('search', event)">Financial Search</div>
+                <div class="tab" onclick="switchTab('errors', event)">Error Summary</div>
             </div>
         </div>
 
@@ -436,10 +445,10 @@
                 </div>
                 
                 <div class="worksheet-tabs">
-                    <div class="worksheet-tab active" onclick="switchWorksheet('Data Validation Errors')">Data Validation Errors</div>
-                    <div class="worksheet-tab" onclick="switchWorksheet('Missing Data')">Missing Data</div>
-                    <div class="worksheet-tab" onclick="switchWorksheet('Format Errors')">Format Errors</div>
-                    <div class="worksheet-tab" onclick="switchWorksheet('Duplicate Records')">Duplicate Records</div>
+                    <div class="worksheet-tab active" onclick="switchWorksheet('Data Validation Errors', event)">Data Validation Errors</div>
+                    <div class="worksheet-tab" onclick="switchWorksheet('Missing Data', event)">Missing Data</div>
+                    <div class="worksheet-tab" onclick="switchWorksheet('Format Errors', event)">Format Errors</div>
+                    <div class="worksheet-tab" onclick="switchWorksheet('Duplicate Records', event)">Duplicate Records</div>
                 </div>
                 
                 <div class="data-table-container" id="errorDataContainer">
@@ -479,6 +488,7 @@
         updateFileList();
         displayWorksheetData(currentWorksheet);
 
+        // --- ZMODYFIKOWANA FUNKCJA OBSŁUGI WYSZUKIWANIA (POPRAWKA 1) ---
         document.getElementById('globalSearchBox').addEventListener('input', function(e) {
             const newSearchTerm = e.target.value.toLowerCase().trim();
             
@@ -494,15 +504,44 @@
                 const activeTab = document.querySelector('.tab.active').textContent;
                 
                 if (activeTab === 'Financial Search') {
-                    updateFileList();
+                    // Update file list first to apply hidden/match state
+                    updateFileList(); 
+
+                    // --- LOGIKA SPRAWDZAJĄCA AKTYWNY PLIK ---
+                    if (selectedFile) {
+                        // Sprawdza, czy wybrany plik jest nadal widoczny (tzn. ma dopasowania)
+                        const selectedFileMatches = filesData[selectedFile] && getMatchCount(filesData[selectedFile], currentSearchTerm) > 0;
+                        
+                        // JEŚLI JEST WYSZUKIWANIE I PLIK NIE PASUJE LUB PLIK ZACZĄŁ PASOWAĆ PO ZMIANIE FRAZY
+                        if (currentSearchTerm && !selectedFileMatches) {
+                            // Jeśli plik jest wybrany, ale przestaje pasować do frazy wyszukiwania
+                            selectedFile = null;
+                            document.getElementById('dataContainer').innerHTML = `
+                                <div class="empty-state">
+                                    <div class="empty-state-icon">📊</div>
+                                    <h3>No file selected</h3>
+                                    <p>Upload Excel files and select one from the left to view its contents</p>
+                                </div>
+                            `;
+                            document.getElementById('contentTitle').textContent = 'Select a file to view data';
+                            document.getElementById('contentSubtitle').textContent = 'Upload Excel files and use the search to filter results';
+                            updateFileList(); // Upewnij się, że klasa active została usunięta
+                            return; 
+                        }
+                    }
+                    
+                    // Jeśli plik nadal jest wybrany (i pasuje, lub brak wyszukiwania), wyświetl go (z filtrowaniem)
                     if (selectedFile) {
                         displayFileData(selectedFile);
                     }
+                    // --- KONIEC LOGIKI ---
+
                 } else if (activeTab === 'Error Summary') {
                     searchInErrorData(currentSearchTerm);
                 }
             }, SEARCH_DEBOUNCE_MS);
         });
+        // --- KONIEC ZMODYFIKOWANEJ FUNKCJI ---
 
         function searchInErrorData(searchTerm) {
             const data = errorSummaryData[currentWorksheet];
@@ -633,9 +672,10 @@
             container.appendChild(fragment);
         }
 
-        function switchTab(tabName) {
+        // POPRAWKA B: Zaktualizowano definicję funkcji
+        function switchTab(tabName, e) {
             document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
-            event.target.classList.add('active');
+            e.target.classList.add('active');
             
             document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
             
@@ -657,9 +697,10 @@
             }
         }
 
-        function switchWorksheet(worksheetName) {
+        // POPRAWKA B: Zaktualizowano definicję funkcji
+        function switchWorksheet(worksheetName, e) {
             document.querySelectorAll('.worksheet-tab').forEach(tab => tab.classList.remove('active'));
-            event.target.classList.add('active');
+            e.target.classList.add('active');
             
             currentWorksheet = worksheetName;
             
@@ -741,7 +782,7 @@
             container.appendChild(fragment);
         }
 
-        // 🚨 UPDATED FUNCTION: Truncate file path to last 3 components (2 parents + file), without ellipsis
+        // Truncate file path to last 3 components (2 parents + file), without ellipsis
         function getDisplayFileName(fileName) {
             // Split the path by both forward (/) and backward (\) slashes
             const parts = fileName.split(/[\\/]/); 
@@ -771,9 +812,10 @@
             if (selectedFile === fileName) {
                 const remainingFiles = Object.keys(filesData);
                 if (remainingFiles.length > 0) {
+                    // POPRAWKA C: Jeśli pliki pozostały, wybierz pierwszy (lub następny)
                     selectedFile = remainingFiles[0];
-                    displayFileData(selectedFile);
                 } else {
+                    // POPRAWKA C: Reset do stanu pustego
                     selectedFile = null;
                     // Reset main content to empty state
                     document.getElementById('dataContainer').innerHTML = `
@@ -790,12 +832,14 @@
 
             // 3. Refresh UI
             updateFileList();
-            if (selectedFile && selectedFile !== fileName) {
-                 // Ensure the current selection is re-rendered if a file was deleted but the selection shifted
-                displayFileData(selectedFile);
+            
+            // POPRAWKA C: Wyświetl dane TYLKO jeśli selectedFile nie jest null
+            if (selectedFile) {
+                 displayFileData(selectedFile);
             }
         }
 
+        // --- ZMODYFIKOWANA FUNKCJA updateFileList (POPRAWKA 2) ---
         function updateFileList() {
             const fileList = document.getElementById('fileList');
             
@@ -821,6 +865,8 @@
                 
                 if (currentSearchTerm && matchCount === 0) {
                     fileItem.classList.add('hidden');
+                    // POPRAWKA 2: Jeśli plik jest ukryty, usuń klasę aktywności
+                    fileItem.classList.remove('active'); 
                 } else {
                     fileItem.classList.remove('hidden');
                 }
@@ -855,7 +901,7 @@
 
 
                 fileItem.addEventListener('click', () => {
-                    // Only handle file selection if the delete button wasn't clicked
+                    // Tylko obsłuż wybór pliku, jeśli nie kliknięto przycisku usuwania
                     if (!event.target.classList.contains('delete-btn')) {
                         document.querySelectorAll('.file-item').forEach(item => item.classList.remove('active'));
                         fileItem.classList.add('active');
@@ -874,27 +920,27 @@
                 fileList.appendChild(noResults);
             }
         }
+        // --- KONIEC ZMODYFIKOWANEJ FUNKCJI ---
 
         function getMatchCount(data, searchTerm) {
             if (!searchTerm) return 0;
             
-            const cacheKey = `matchCount_${selectedFile}_${searchTerm}`;
-            if (searchCache.has(cacheKey)) {
-                return searchCache.get(cacheKey);
-            }
-            
-            let count = 0;
             const searchLower = searchTerm.toLowerCase();
             
             const fileName = Object.keys(filesData).find(key => filesData[key] === data);
             if (fileName && fileSearchIndex[fileName]) {
                 const index = fileSearchIndex[fileName];
+                let count = 0;
                 for (let i = 0; i < index.length; i++) {
+                    // Sprawdzenie, czy sklejony wiersz zawiera frazę
                     if (index[i].includes(searchLower)) {
                         count++;
                     }
                 }
+                return count;
             } else {
+                // Fallback (wolniejsze) obliczenia, jeśli indeks nie istnieje (tylko dla bezpieczeństwa)
+                let count = 0;
                 for (let i = 0; i < data.length; i++) {
                     const row = data[i];
                     for (const key in row) {
@@ -904,16 +950,15 @@
                         }
                     }
                 }
+                return count;
             }
-            
-            searchCache.set(cacheKey, count);
-            return count;
         }
         
         function buildSearchIndex(fileName, data) {
             const index = [];
             for (let i = 0; i < data.length; i++) {
                 const row = data[i];
+                // Tworzy sklejony, mały ciąg znaków dla szybkiego wyszukiwania wierszy
                 const searchStr = Object.values(row).map(v => v === null || v === undefined ? '' : String(v)).join('|').toLowerCase();
                 index.push(searchStr);
             }
@@ -926,7 +971,7 @@
             const contentSubtitle = document.getElementById('contentSubtitle');
             const dataContainer = document.getElementById('dataContainer');
 
-            // Use truncated name in header
+            // Użyj skróconej nazwy w nagłówku
             contentTitle.textContent = getDisplayFileName(fileName);
             
             let filteredData = data;
@@ -1071,6 +1116,7 @@
                 return new Promise(resolve => {
                     const reader = new FileReader();
                     reader.onload = function(e) {
+                        let success = false;
                         try {
                             const data = new Uint8Array(e.target.result);
                             const workbook = XLSX.read(data, { type: 'array' });
@@ -1084,18 +1130,20 @@
                                 filesData[file.name] = jsonData;
                                 buildSearchIndex(file.name, jsonData);
                                 console.log(`Loaded ${file.name}: ${jsonData.length} rows`);
+                                success = true;
                             }
 
                         } catch (error) {
                             console.error(`Error reading file ${file.name}:`, error);
-                            alert(`Error reading file ${file.name}: ${error.message}`);
+                            // Ostrzeżenie bez alertu, aby nie blokować pętli
+                            console.warn(`File loading warning: Could not read or parse file ${file.name}. It may not be a valid Excel file.`); 
                         }
                         
                         processedCount++;
                         if (loadingDiv) {
                             loadingDiv.innerHTML = `<p>Processing ${totalFiles} file(s)... (${processedCount}/${totalFiles})</p>`;
                         }
-                        resolve(); 
+                        resolve(success); // Resolve z informacją o sukcesie
                     };
                     reader.onerror = () => {
                         console.error(`File read error for ${file.name}`);
@@ -1103,26 +1151,36 @@
                         if (loadingDiv) {
                             loadingDiv.innerHTML = `<p>Processing ${totalFiles} file(s)... (${processedCount}/${totalFiles})</p>`;
                         }
-                        resolve();
+                        resolve(false); // Resolve z informacją o błędzie
                     };
                     reader.readAsArrayBuffer(file);
                 });
             });
 
-            Promise.all(filePromises).then(() => {
+            Promise.all(filePromises).then((results) => {
                 if (loadingDiv) {
                     loadingDiv.remove();
                 }
+                
+                // Filtruj tylko pliki, które zostały pomyślnie przetworzone
+                const successfullyLoadedFiles = Array.from(files)
+                                                    .filter((_, index) => results[index])
+                                                    .map(f => f.name);
 
                 if (Object.keys(filesData).length > 0) {
-                    // Only select the *first* newly uploaded file if no file is currently selected
-                    if (!selectedFile || files.length > 0) {
-                         const newFiles = Array.from(files).map(f => f.name).filter(name => filesData[name]);
-                         selectedFile = newFiles.length > 0 ? newFiles[0] : Object.keys(filesData)[0];
+                    // Wybierz PIERWSZY z nowo załadowanych plików, jeśli wcześniej nic nie było wybrane
+                    if (!selectedFile && successfullyLoadedFiles.length > 0) {
+                         selectedFile = successfullyLoadedFiles[0];
+                    } else if (!selectedFile && Object.keys(filesData).length > 0) {
+                         // Jeśli żadne nowe pliki nie zostały dodane (np. nadpisano istniejący), wybierz pierwszy z listy
+                         selectedFile = Object.keys(filesData)[0];
                     }
-                    displayFileData(selectedFile);
+                    
+                    if (selectedFile) {
+                        displayFileData(selectedFile);
+                    }
                 } else {
-                    // Keep the empty state if nothing was uploaded/parsed
+                    // Zachowaj pusty stan, jeśli nic nie zostało załadowane
                     selectedFile = null;
                 }
                 updateFileList();
